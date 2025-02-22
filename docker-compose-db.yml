@@ -1,0 +1,17 @@
+services:
+  mysql:
+    image: mysql:8.2.0
+    restart: always
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${GRIM_MYSQL_DATABASE}
+      MYSQL_USER: ${GRIM_MYSQL_USER}
+      MYSQL_PASSWORD: ${GRIM_MYSQL_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+      DEFAULT_AUTHENTICATION_PLUGIN: caching_sha2_password
+volumes:
+  mysql-data:
