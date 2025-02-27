@@ -1,6 +1,6 @@
-name: ":rocket: Feature"
+name: "🚀 Deploy"
 description: "배포 관련 작업"
-labels: ["Deploy"]
+labels: ["deploy"]
 body:
   - type: textarea
     attributes:
