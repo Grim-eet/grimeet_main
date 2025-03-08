@@ -11,6 +11,12 @@ import java.util.Arrays;
 @Configuration
 public class CorsConfig {
 
+  /**
+   * CORS 설정
+   * - 허용할 Origin, Method, Header 설정
+   * - preflight 요청에 대한 응답 헤더 설정 (OPTIONS) - 1시간 캐싱으로 초기 셋팅
+   * @return CorsConfigurationSource
+   */
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -25,6 +31,7 @@ public class CorsConfig {
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     corsConfiguration.addExposedHeader("Authorization");
     corsConfiguration.addAllowedHeader("*");
+    corsConfiguration.setMaxAge(3600L);
 
     source.registerCorsConfiguration("/**", corsConfiguration);
 
