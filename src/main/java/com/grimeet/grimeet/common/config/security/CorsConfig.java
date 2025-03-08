@@ -24,9 +24,7 @@ public class CorsConfig {
 
     corsConfiguration.setAllowCredentials(true);
 
-    corsConfiguration.addAllowedOrigin("http://localhost:3000");
-    corsConfiguration.addAllowedOrigin("http://localhost:5173");
-    corsConfiguration.addAllowedOriginPattern("https://*.grimeet.com");
+    corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "https://*.grimeet.com"));
 
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     corsConfiguration.addExposedHeader("Authorization");
