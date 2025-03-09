@@ -36,7 +36,8 @@ public class User extends BaseTime {
     @Column(name = "user_phone_number", length = 20, nullable = true, unique = false, updatable = true)
     private String phoneNumber;
 
-    @Column(name = "user_status", nullable = false, updatable = false, columnDefinition = "TINYINT")
+    @Setter
+    @Column(name = "user_status", nullable = false, updatable = true, columnDefinition = "TINYINT")
     @Convert(converter = UserStatusConverter.class)
     private UserStatus userStatus;
 

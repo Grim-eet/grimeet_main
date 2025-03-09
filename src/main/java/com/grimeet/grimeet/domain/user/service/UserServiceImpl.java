@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.dto.UserUpdatePasswordRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.entity.User;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
         log.info("User Create Request : {}", createRequestDto);
@@ -74,17 +76,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateDormantUser(Long userId) {
+    public void updateDormantUser(String email) {
+
+    }
+
+    @Transactional
+    @Override
+    public void updateWithdrawUser(String email) {
+        User user = findUserByEmail(email).get();
+        user.setUserStatus(UserStatus.WITHDRAWAL);
 
     }
 
     @Override
-    public void updateWithdrawUser(Long userId) {
-
-    }
-
-    @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(String email) {
 
     }
 

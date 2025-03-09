@@ -23,9 +23,10 @@ public interface UserService {
 //  void updateUser(UserUpdateRequestDto userUpdateRequestDto, Long userId);
 
     // 휴면 계정으로 전환
-    void updateDormantUser(Long userId);
+    void updateDormantUser(String email);
     // 탈퇴 회원으로 전환
-    void updateWithdrawUser(Long userId);
+    void updateWithdrawUser(String email);
     // User 삭제
-    void deleteUser(Long userId);
+    void deleteUser(String email);
+
 }

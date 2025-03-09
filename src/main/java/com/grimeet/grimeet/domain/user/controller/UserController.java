@@ -4,6 +4,7 @@ package com.grimeet.grimeet.domain.user.controller;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserUpdatePasswordRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.dto.UserUpdateStatusRequestDto;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +25,10 @@ public class UserController {
     @PatchMapping("/update/password")
     public UserResponseDto updateUserPassword(@Valid @RequestBody UserUpdatePasswordRequestDto requestDto) {
         return userService.updateUserPassword(requestDto);
+    }
+
+    @PatchMapping("/update/userStatus")
+    public void updateUserStatus(@Valid @RequestBody UserUpdateStatusRequestDto requestDto) {
+        userService.updateWithdrawUser(requestDto.getEmail());
     }
 }
