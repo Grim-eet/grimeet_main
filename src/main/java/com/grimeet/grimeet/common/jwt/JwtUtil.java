@@ -58,7 +58,7 @@ public class JwtUtil {
 
     return Jwts.builder()
       .setSubject(userDetails.getUsername())
-      .claim("email", userDetails.getUserEmail())
+      .claim("email", userDetails.getUsername())
       .claim("role", userDetails.getAuthorities())
       .setIssuedAt(now)
       .setExpiration(expireDate)
@@ -77,7 +77,7 @@ public class JwtUtil {
 
     return Jwts.builder()
             .setSubject(userDetails.getUsername())
-            .claim("email", userDetails.getUserEmail())
+            .claim("email", userDetails.getUsername())
             .claim("role", userDetails.getAuthorities())
             .setIssuedAt(now)
             .setExpiration(expireDate)

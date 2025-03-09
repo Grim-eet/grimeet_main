@@ -21,20 +21,20 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
   /**
    * 사용자 정보를 조회하여 UserDetails 객체를 반환.
-   * @param nickname
+   * @param userEmail
    * @return UserDetails
    * @throws UsernameNotFoundException
    */
   @Override
-  public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
-    User findUser = findUserByEmailOrThrow(nickname);
+  public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
+    User findUser = findUserByEmailOrThrow(userEmail);
 
     List<GrantedAuthority> authorities = Collections.singletonList((GrantedAuthority) () -> "ROLE_USER");
     return new UserPrincipalDetails(findUser, authorities);
   }
 
-  private User findUserByEmailOrThrow(String nickname) {
-    return userRepository.findByNickname(nickname)
-            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다. nickname: " + nickname));
+  private User findUserByEmailOrThrow(String userEmail) {
+    return userRepository.findByNickname(userEmail)
+            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다. email: " + userEmail));
   }
 }

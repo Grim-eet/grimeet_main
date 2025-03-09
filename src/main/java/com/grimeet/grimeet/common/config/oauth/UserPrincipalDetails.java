@@ -30,10 +30,6 @@ public class UserPrincipalDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getNickname();
-    }
-
-    public String getUserEmail() {
         return user.getEmail();
     }
 
