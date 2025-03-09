@@ -20,7 +20,8 @@ repositories {
 dependencies {
 	// Spring Boot
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	// DB
@@ -34,8 +35,8 @@ dependencies {
 	// Cache - Redis
 //	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	// Security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	testImplementation 'org.springframework.security:spring-security-test'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	testImplementation 'org.springframework.security:spring-security-test'
 	// OAuth2.0
 //	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	// Lombok
