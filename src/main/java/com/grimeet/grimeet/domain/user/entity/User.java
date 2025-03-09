@@ -5,6 +5,7 @@ import com.grimeet.grimeet.domain.user.config.UserStatusConverter;
 import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "USERS")
 @Getter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "id", callSuper = true) // EqualsAndHashCode 어노테이션 추가, of = "id" 옵션 지정
 public class User extends BaseTime {
 
     @Id
