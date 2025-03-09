@@ -4,6 +4,7 @@ package com.grimeet.grimeet.domain.user.controller;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/create")
-    public UserResponseDto createUser(@RequestBody UserCreateRequestDto userCreateRequestDto ) {
+    public UserResponseDto createUser(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto ) {
         return userService.createUser(userCreateRequestDto);
     }
 }
