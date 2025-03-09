@@ -20,7 +20,7 @@ public class User extends BaseTime {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "user_name", length = 20, nullable = false, unique = false, updatable = true)
+    @Column(name = "user_name", length = 20, nullable = false, unique = false, updatable = false)
     private String name;
 
     @Column(name = "user_email", length = 255, nullable = false, unique = true, updatable = false)
@@ -30,9 +30,11 @@ public class User extends BaseTime {
     @Column(name = "user_password", length = 255, nullable = false, unique = false, updatable = true)
     private String password;
 
+    @Setter
     @Column(name = "user_nickname", length = 20, nullable = false, unique = true, updatable = true)
     private String nickname;
 
+    @Setter
     @Column(name = "user_phone_number", length = 20, nullable = true, unique = true, updatable = true)
     private String phoneNumber;
 

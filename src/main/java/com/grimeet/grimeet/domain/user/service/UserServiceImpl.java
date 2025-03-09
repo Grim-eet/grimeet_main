@@ -1,9 +1,6 @@
 package com.grimeet.grimeet.domain.user.service;
 
-import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserStatus;
-import com.grimeet.grimeet.domain.user.dto.UserUpdatePasswordRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -77,6 +74,18 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
+    @Override
+    public void updateUserNickname(UserUpdateNicknameRequestDto requestDto) {
+        User user = findUserByEmail(requestDto.getEmail()).get();
+
+        verifyUserStatus(user.getUserStatus());
+        verifySameNickname(user.getNickname(), requestDto.getNewNickname());
+        verifyUniqueNickname(requestDto.getNewNickname());
+
+        user.setNickname(requestDto.getNewNickname());
+    }
+
     @Override
     public void updateDormantUser(String email) {
 
@@ -134,6 +143,19 @@ public class UserServiceImpl implements UserService {
     private void verifyUserStatus(UserStatus userStatus) {
         if (userStatus == UserStatus.WITHDRAWAL) {
             throw new IllegalArgumentException("탈퇴 회원은 비밀번호 변경이 불가합니다.");
+        }
+    }
+
+    private void verifySameNickname(String oldNickname, String newNickname) {
+        if (oldNickname.equals(newNickname)) {
+            throw new IllegalArgumentException("기존과 같은 닉네임입니다.");
+        }
+    }
+
+    private void verifyUniqueNickname(String newNickname) {
+        Optional<User> user = userRepository.findByNickname(newNickname);
+        if (!user.isEmpty()) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
     }
 }
