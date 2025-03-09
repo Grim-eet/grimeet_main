@@ -4,10 +4,7 @@ import com.grimeet.grimeet.common.entity.BaseTime;
 import com.grimeet.grimeet.domain.user.config.UserStatusConverter;
 import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -29,6 +26,7 @@ public class User extends BaseTime {
     @Column(name = "user_email", length = 255, nullable = false, unique = true, updatable = false)
     private String email;
 
+    @Setter
     @Column(name = "user_password", length = 255, nullable = false, unique = false, updatable = true)
     private String password;
 

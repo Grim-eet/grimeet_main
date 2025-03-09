@@ -1,7 +1,9 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserUpdatePasswordRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.entity.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +12,13 @@ public interface UserService {
 
     UserResponseDto createUser(UserCreateRequestDto requestDto);
 
-    Optional<UserCreateRequestDto> findUserByUserId(Long userId);
-    Optional<UserCreateRequestDto> findUserByEmail(String email);
-    Optional<UserCreateRequestDto> fineUserByNickname(String nickname);
+    Optional<User> findUserByUserId(Long userId);
+    Optional<User> findUserByEmail(String email);
+    Optional<User> fineUserByNickname(String nickname);
 
-    List<UserCreateRequestDto> findAllUsers();
+    List<User> findAllUsers();
+
+    UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 
 //  void updateUser(UserUpdateRequestDto userUpdateRequestDto, Long userId);
 
