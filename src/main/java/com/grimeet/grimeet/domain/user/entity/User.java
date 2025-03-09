@@ -33,7 +33,7 @@ public class User extends BaseTime {
     @Column(name = "user_nickname", length = 20, nullable = false, unique = true, updatable = true)
     private String nickname;
 
-    @Column(name = "user_phone_number", length = 20, nullable = true, unique = false, updatable = true)
+    @Column(name = "user_phone_number", length = 20, nullable = true, unique = true, updatable = true)
     private String phoneNumber;
 
     @Setter

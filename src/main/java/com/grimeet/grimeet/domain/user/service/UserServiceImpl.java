@@ -37,20 +37,6 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(savedUser);
     }
 
-    @Transactional
-    @Override
-    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
-        User user = findUserByEmail(requestDto.getEmail()).get();
-
-        verifyCurrentPassword(user.getPassword(), requestDto.getPassword());
-        verifyNewPassword(user.getPassword(), requestDto.getNewPassword());
-        verifyConfirmPassword(requestDto.getNewPassword(), requestDto.getConfirmPassword());
-
-        user.setPassword(requestDto.getNewPassword());
-
-        return new UserResponseDto(user);
-    }
-
     @Override
     public Optional<User> findUserByUserId(Long userId) {
         return Optional.empty();
@@ -73,6 +59,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findAllUsers() {
         return List.of();
+    }
+
+    @Transactional
+    @Override
+    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
+        User user = findUserByEmail(requestDto.getEmail()).get();
+
+        verifyUserStatus(user.getUserStatus());
+
+        verifyCurrentPassword(user.getPassword(), requestDto.getPassword());
+        verifyNewPassword(user.getPassword(), requestDto.getNewPassword());
+        verifyConfirmPassword(requestDto.getNewPassword(), requestDto.getConfirmPassword());
+
+        user.setPassword(requestDto.getNewPassword());
+
+        return new UserResponseDto(user);
     }
 
     @Override
@@ -126,6 +128,12 @@ public class UserServiceImpl implements UserService {
     private void verifyConfirmPassword(String newPassword, String confirmPassword) {
         if (!confirmPassword.equals(newPassword)) {
             throw new IllegalArgumentException("입력하신 비밀번호와 다릅니다.");
+        }
+    }
+
+    private void verifyUserStatus(UserStatus userStatus) {
+        if (userStatus == UserStatus.WITHDRAWAL) {
+            throw new IllegalArgumentException("탈퇴 회원은 비밀번호 변경이 불가합니다.");
         }
     }
 }
