@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateNicknameRequestDto {
+public class UserUpdatePhoneNumberRequestDto {
 
     @NotBlank
     @Email
@@ -19,6 +19,5 @@ public class UserUpdateNicknameRequestDto {
 
     @NotBlank
     @Size(max = 20)
-    private String nickname;
-
+    private String phoneNumber;
 }

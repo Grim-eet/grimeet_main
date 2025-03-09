@@ -41,15 +41,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findUserByEmail(String email) {
-        Optional<User> userByEmail = userRepository.findByEmail(email);
-        if (userByEmail.isEmpty()) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) {
             throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
         }
-        return userByEmail;
+        return user;
     }
 
     @Override
-    public Optional<User> fineUserByNickname(String nickname) {
+    public Optional<User> findUserByNickname(String nickname) {
+        Optional<User> user = userRepository.findByNickname(nickname);
+        if (!user.isEmpty()) {
+            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+        }
+        return user;
+    }
+
+    @Override
+    public Optional<User> findUserByPhoneNumber(String phoneNumber) {
         return Optional.empty();
     }
 
@@ -80,10 +89,22 @@ public class UserServiceImpl implements UserService {
         User user = findUserByEmail(requestDto.getEmail()).get();
 
         verifyUserStatus(user.getUserStatus());
-        verifySameNickname(user.getNickname(), requestDto.getNewNickname());
-        verifyUniqueNickname(requestDto.getNewNickname());
+        verifySameNickname(user.getNickname(), requestDto.getNickname());
+        verifyUniqueNickname(requestDto.getNickname());
 
-        user.setNickname(requestDto.getNewNickname());
+        user.setNickname(requestDto.getNickname());
+    }
+
+    @Transactional
+    @Override
+    public void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto) {
+        User user = findUserByEmail(requestDto.getEmail()).get();
+
+        verifyUserStatus(user.getUserStatus());
+        verifySamePhoneNumber(user.getPhoneNumber(), requestDto.getPhoneNumber());
+        verifyUniquePhoneNumber(requestDto.getPhoneNumber());
+
+        user.setPhoneNumber(requestDto.getPhoneNumber());
     }
 
     @Override
@@ -153,9 +174,21 @@ public class UserServiceImpl implements UserService {
     }
 
     private void verifyUniqueNickname(String newNickname) {
-        Optional<User> user = userRepository.findByNickname(newNickname);
-        if (!user.isEmpty()) {
+        if (userRepository.existsByNickname(newNickname)) {
             throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
         }
     }
+
+    private void verifySamePhoneNumber(String oldPhoneNumber, String newPhoneNumber) {
+        if (oldPhoneNumber.equals(newPhoneNumber)) {
+            throw new IllegalArgumentException("기존과 같은 번호입니다.");
+        }
+    }
+
+    private void verifyUniquePhoneNumber(String phoneNumber) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new IllegalArgumentException("이미 존재하는 전화번호입니다.");
+        }
+    }
+
 }

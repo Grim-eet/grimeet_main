@@ -33,4 +33,9 @@ public class UserController {
     public void updateNickname(@Valid @RequestBody UserUpdateNicknameRequestDto requestDto) {
         userService.updateUserNickname(requestDto);
     }
+
+    @PatchMapping("/update/phoneNumber")
+    public void updatePhoneNumber(@Valid @RequestBody UserUpdatePhoneNumberRequestDto requestDto) {
+        userService.updateUserPhoneNumber(requestDto);
+    }
 }

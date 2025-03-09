@@ -1,9 +1,6 @@
 package com.grimeet.grimeet.domain.user.service;
 
-import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserUpdateNicknameRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserUpdatePasswordRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 
 import java.util.List;
@@ -15,13 +12,15 @@ public interface UserService {
 
     Optional<User> findUserByUserId(Long userId);
     Optional<User> findUserByEmail(String email);
-    Optional<User> fineUserByNickname(String nickname);
+    Optional<User> findUserByNickname(String nickname);
+    Optional<User> findUserByPhoneNumber(String phoneNumber);
 
     List<User> findAllUsers();
 
     UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 
     void updateUserNickname(UserUpdateNicknameRequestDto requestDto);
+    void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto);
 
     // 휴면 계정으로 전환
     void updateDormantUser(String email);
