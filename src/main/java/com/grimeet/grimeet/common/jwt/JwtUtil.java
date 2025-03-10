@@ -116,6 +116,7 @@ public class JwtUtil {
 
   // RefreshToken 유효성 검사
   public boolean validateRefreshToken(String token) {
+    if(token == null || token.isEmpty()) return false;
     return validateToken(token);
   }
 
