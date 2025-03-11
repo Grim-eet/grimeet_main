@@ -4,9 +4,12 @@ import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
+import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
@@ -28,6 +31,34 @@ public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final BCryptPasswordEncoder passwordEncoder;
 
+  @Override
+  public void register(UserCreateRequestDto userCreateRequestDto) {
+    log.info("User Create Request : {}", userCreateRequestDto);
+    verifyExistUser(userCreateRequestDto);
+
+    String encryptedPassword = passwordEncoder.encode(userCreateRequestDto.getPassword());
+
+    User createdUser = User.builder()
+            .name(userCreateRequestDto.getName())
+            .email(userCreateRequestDto.getEmail())
+            .password(encryptedPassword)
+            .nickname(userCreateRequestDto.getNickname())
+            .phoneNumber(userCreateRequestDto.getPhoneNumber())
+            .userStatus(UserStatus.NORMAL)
+            .build();
+
+    userRepository.save(createdUser);
+  }
+
+  private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {
+    if(userRepository.existsByEmail(userCreateRequestDto.getEmail())) {
+      throw new GrimeetException(ExceptionStatus.LOGIN_ID_ALREADY_EXISTS);
+    }
+    if(userRepository.existsByNickname(userCreateRequestDto.getNickname())) {
+      throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
+    }
+  }
+
   /**
    * AccessToken을 생성하는 메서드
    * @param refreshToken
@@ -35,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   @Transactional
-  public String createAccessToken(String refreshToken) {
+  public AuthResponseDto createAccessToken(String refreshToken) {
     if(!jwtUtil.validateRefreshToken(refreshToken)) {
       throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
     }
@@ -51,13 +82,13 @@ public class AuthServiceImpl implements AuthService {
 
     rotateRefreshToken(findUserDetail, findRefreshToken);
 
-    return newAccessToken;
+    return new AuthResponseDto(newAccessToken);
   }
 
   @Transactional
   public void rotateRefreshToken(UserDetails userDetails, RefreshToken refreshToken) {
     String newRefreshToken = jwtUtil.generateRefreshToken((UserPrincipalDetails) userDetails);
-    refreshToken.updateToken(refreshToken.getToken());
+    refreshToken.updateToken(newRefreshToken);
   }
 
   @Override

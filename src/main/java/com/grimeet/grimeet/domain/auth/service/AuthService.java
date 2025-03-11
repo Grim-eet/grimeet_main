@@ -2,9 +2,12 @@ package com.grimeet.grimeet.domain.auth.service;
 
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 
 public interface AuthService {
-  String createAccessToken(String refreshToken);
+  void register(UserCreateRequestDto userCreateRequestDto);
+
+  AuthResponseDto createAccessToken(String refreshToken);
 
   String login(UserLoginRequestDto userLoginRequestDto);
 
