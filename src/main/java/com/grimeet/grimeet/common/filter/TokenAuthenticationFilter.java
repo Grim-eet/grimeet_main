@@ -34,15 +34,21 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
    */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String token = jwtUtil.resolveToken(request);
-    if (token != null && jwtUtil.validateAccessToken(token)) {
-      String username = jwtUtil.getUsernameFromAccessToken(token);
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-      authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    try {
+      String token = jwtUtil.resolveToken(request);
+      if (token != null && jwtUtil.validateAccessToken(token)) {
+        String username = jwtUtil.getUsernameFromAccessToken(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+      }
+    } catch (Exception e) {
+      // 토큰 처리 중 발생한 예외를 로깅하지만, 필터 체인은 계속 진행
+      logger.error("Cannot set user authentication: " + e.getMessage());
+      SecurityContextHolder.clearContext(); // 인증 컨텍스트 초기화
     }
     filterChain.doFilter(request, response);
-
   }
 }
