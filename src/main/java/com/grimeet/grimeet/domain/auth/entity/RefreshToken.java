@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "REFRESH_TOKENS")
 public class RefreshToken extends BaseTime {
 
   @Id
