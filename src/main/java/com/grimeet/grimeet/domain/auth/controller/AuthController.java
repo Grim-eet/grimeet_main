@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.auth.controller;
 
+import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.service.AuthService;
@@ -36,9 +37,8 @@ public class AuthController {
   }
 
 //  @PostMapping("/logout")
-//  public ResponseEntity<String> logout(@AuthenticationPrincipal String userEmail) {
-//    authService.logout(refreshToken, userEmail);
+//  public ResponseEntity<String> logout(@AuthenticationPrincipal(expression = "username") String userEmail) {
+//    authService.logout(userEmail);
 //    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("로그아웃 되었습니다.");
 //  }
-
 }
