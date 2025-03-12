@@ -9,6 +9,7 @@ import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
@@ -32,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override
-  public void register(UserCreateRequestDto userCreateRequestDto) {
+  public UserResponseDto register(UserCreateRequestDto userCreateRequestDto) {
     log.info("User Create Request : {}", userCreateRequestDto);
     verifyExistUser(userCreateRequestDto);
 
@@ -48,6 +49,8 @@ public class AuthServiceImpl implements AuthService {
             .build();
 
     userRepository.save(createdUser);
+
+    return new UserResponseDto(createdUser);
   }
 
   private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {
@@ -108,7 +111,17 @@ public class AuthServiceImpl implements AuthService {
     // refreshToken생성
     String refreshToken = jwtUtil.generateRefreshToken((UserPrincipalDetails) findUserDetails);
 
-    refreshTokenRepository.save(new RefreshToken(findUser.getEmail(), refreshToken));
+
+    refreshTokenRepository.findByEmail(findUser.getEmail()).ifPresentOrElse(
+            findRefreshToken -> { // 이미 Refresh Token이 있으면 업데이트
+              findRefreshToken.updateToken(refreshToken);
+              refreshTokenRepository.save(findRefreshToken);
+            },
+            () -> { // Refresh Token이 없으면 새로 생성
+              RefreshToken newRefreshToken = new RefreshToken(findUser.getEmail(), refreshToken); //userId사용하는 생성자로 변경
+              refreshTokenRepository.save(newRefreshToken);
+            }
+    );
 
     // accessToken 반환
     return accessToken;

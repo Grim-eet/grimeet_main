@@ -3,9 +3,10 @@ package com.grimeet.grimeet.domain.auth.service;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
+import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 
 public interface AuthService {
-  void register(UserCreateRequestDto userCreateRequestDto);
+  UserResponseDto register(UserCreateRequestDto userCreateRequestDto);
 
   AuthResponseDto createAccessToken(String refreshToken);
 
