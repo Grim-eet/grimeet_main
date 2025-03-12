@@ -129,22 +129,20 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   @Transactional
-  public void logout(String refreshToken) {
-    RefreshToken findRefreshToken = verifyExistRefreshTokenByRefreshToken(refreshToken);
+  public void logout(String userEmail) {
+    RefreshToken findRefreshToken = verifyExistRefreshTokenByUsername(userEmail);
     String findUsername = jwtUtil.getUsernameFromRefreshToken(findRefreshToken.getToken());
-    User findUser = userRepository.findByEmail(findUsername).orElseThrow(() -> {
+    verifyExistUsername(findUsername);
+
+    findRefreshToken.updateToken("");
+  }
+
+  private void verifyExistUsername(String findUsername) {
+    userRepository.findByEmail(findUsername).orElseThrow(() -> {
       throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
     });
-    RefreshToken findUserRefreshToken = verifyExistRefreshTokenByUserInfo(findUser);
-
-    findUserRefreshToken.updateToken("");
   }
 
-  private RefreshToken verifyExistRefreshTokenByUserInfo(User findUser) {
-    return refreshTokenRepository.findByEmail(findUser.getEmail()).orElseThrow(() -> {
-      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
-    });
-  }
 
   private RefreshToken verifyExistRefreshTokenByRefreshToken(String refreshToken) {
     return refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> {

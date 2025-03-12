@@ -12,5 +12,5 @@ public interface AuthService {
 
   String login(UserLoginRequestDto userLoginRequestDto);
 
-  void logout(String refreshToken);
+  void logout(String userEmail);
 }
