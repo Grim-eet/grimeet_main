@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.domain.user.dto;
 
 
+import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,5 +26,17 @@ public class UserResponseDto {
         this.phoneNumber = user.getPhoneNumber();
         this.profileImageUrl = user.getProfileImageUrl();
         this.userStatus = user.getUserStatus();
+    }
+
+    public User toEntity(UserResponseDto userResponseDto) {
+        return User.builder()
+                .id(userResponseDto.getId())
+                .name(userResponseDto.getName())
+                .email(userResponseDto.getEmail())
+                .nickname(userResponseDto.getNickname())
+                .phoneNumber(userResponseDto.getPhoneNumber())
+                .profileImageUrl(userResponseDto.getProfileImageUrl())
+                .userStatus(userResponseDto.getUserStatus())
+                .build();
     }
 }
