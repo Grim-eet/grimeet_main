@@ -36,7 +36,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
   }
 
   private User findUserByEmailOrThrow(String userEmail) {
-    return userRepository.findByNickname(userEmail)
+    return userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
   }
 }
