@@ -25,17 +25,14 @@ public class AuthController {
 
   @PostMapping("/register")
   public ResponseEntity<String> register(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
-    UserResponseDto registeredUser = authService.register(userCreateRequestDto);
-    User findUser = registeredUser.toEntity(registeredUser);
-    UserLoginRequestDto registerUserLoginInfo = new UserLoginRequestDto(findUser.getEmail(), findUser.getPassword());
-    String accessToken = authService.login(registerUserLoginInfo);
-    return ResponseEntity.status(HttpStatus.CREATED).body(accessToken); // 또는 성공 메시지만 반환
+    authService.register(userCreateRequestDto);
+    return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료되었습니다.");
   }
 
   @PostMapping("/login")
   public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
     String accessToken = authService.login(userLoginRequestDto);
-    return ResponseEntity.ok(new AuthResponseDto(accessToken));
+    return ResponseEntity.status(HttpStatus.OK).body(new AuthResponseDto(accessToken));
   }
 
 //  @PostMapping("/logout")
