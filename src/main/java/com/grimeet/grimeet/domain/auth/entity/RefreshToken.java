@@ -19,7 +19,7 @@ public class RefreshToken extends BaseTime {
   @Column(name = "user_email", length = 255, nullable = false, unique = true, updatable = false)
   private String email;
 
-  @Column(nullable = false, unique = true)
+  @Column(name = "user_refresh_token", length = 500 , nullable = false, unique = true)
   private String token;
 
   @Builder
