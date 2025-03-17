@@ -35,7 +35,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
+  public ResponseEntity<Void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
     String accessToken = authService.login(userLoginRequestDto);
 
     // 쿠키 생성 및 설정
