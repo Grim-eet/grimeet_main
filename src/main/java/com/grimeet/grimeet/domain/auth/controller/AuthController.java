@@ -8,6 +8,7 @@ import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.entity.User;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +36,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
+  public ResponseEntity<Void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
     String accessToken = authService.login(userLoginRequestDto);
 
     // 쿠키 생성 및 설정
@@ -44,6 +45,7 @@ public class AuthController {
     cookie.setSecure(false);  // 배포 환경 시 true로 변경
     cookie.setPath("/");  // 모든 경로에서 접근 가능하도록 설정
     cookie.setMaxAge(cookieMaxAge);  // 24시간 동안 유효
+    response.addCookie(cookie);
 
     return ResponseEntity.status(HttpStatus.OK).build();
   }
