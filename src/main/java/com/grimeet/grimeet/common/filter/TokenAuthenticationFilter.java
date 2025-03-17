@@ -4,6 +4,7 @@ import com.grimeet.grimeet.common.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     try {
-      String token = jwtUtil.resolveToken(request);
+      String token = extractTokenFromCookie(request);
+      if(token == null) {
+        token = jwtUtil.resolveToken(request);
+      }
       if (token != null && jwtUtil.validateAccessToken(token)) {
         String username = jwtUtil.getUsernameFromAccessToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -50,5 +54,22 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       SecurityContextHolder.clearContext(); // 인증 컨텍스트 초기화
     }
     filterChain.doFilter(request, response);
+  }
+
+  /**
+   * Cookie에서 Token 추출
+   * @param request
+   * @return cookie에 저장된 token
+   */
+  private String extractTokenFromCookie(HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for(Cookie cookie : cookies) {
+        if("Authorization_Access".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
   }
 }

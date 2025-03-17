@@ -7,8 +7,10 @@ import com.grimeet.grimeet.domain.auth.service.AuthService;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.entity.User;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final AuthService authService;
+  @Value("${cookie.max-age.access}")
+  private int cookieMaxAge;
 
   @PostMapping("/register")
   public ResponseEntity<String> register(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto) {
@@ -31,9 +35,17 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
+  public ResponseEntity<void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto) {
     String accessToken = authService.login(userLoginRequestDto);
-    return ResponseEntity.status(HttpStatus.OK).body(new AuthResponseDto(accessToken));
+
+    // 쿠키 생성 및 설정
+    Cookie cookie = new Cookie("Authorization_Access", accessToken);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false);  // 배포 환경 시 true로 변경
+    cookie.setPath("/");  // 모든 경로에서 접근 가능하도록 설정
+    cookie.setMaxAge(cookieMaxAge);  // 24시간 동안 유효
+
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
 //  @PostMapping("/logout")
