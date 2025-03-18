@@ -1,6 +1,8 @@
 spring:
   application:
     name: grimeet
+  jackson:
+    time-zone: Asia/Seoul
   datasource:
     url: jdbc:mysql://127.0.0.1:3307/grim?serverTimezone=UTC&characterEncoding=UTF-8
     username: ${GRIM_MYSQL_USER}
