@@ -52,4 +52,20 @@ public class UserLog extends BaseTime {
   @Comment("사용자 ID")
   @Column(name = "user_id", nullable = false, updatable = false)
   private Long userId;
+
+  public void updateLastLoginAt(Date lastLoginAt) {
+    this.lastLoginAt = lastLoginAt;
+  }
+
+  public void updateChangedPasswordAt(Date changedPasswordAt) {
+    this.changedPasswordAt = changedPasswordAt;
+  }
+
+  public void updateNextDormantCheckDate(Date nextDormantCheckDate) {
+    this.nextDormantCheckDate = nextDormantCheckDate;
+  }
+
+  public void updateNextNotificationDate(Date nextNotificationDate) {
+    this.nextNotificationDate = nextNotificationDate;
+  }
 }
