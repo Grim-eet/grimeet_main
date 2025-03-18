@@ -13,6 +13,7 @@ public interface UserService {
     Optional<UserCreateRequestDto> findUserByUserId(Long userId);
     Optional<UserCreateRequestDto> findUserByEmail(String email);
     Optional<UserCreateRequestDto> fineUserByNickname(String nickname);
+    UserResponseDto findUserByUserEmail(String email);
 
     List<UserCreateRequestDto> findAllUsers();
 

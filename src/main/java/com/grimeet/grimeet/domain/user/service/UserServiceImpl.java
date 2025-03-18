@@ -49,6 +49,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseDto findUserByUserEmail(String email) {
+        Optional<UserResponseDto> findUser = userRepository.findByEmail(email);
+        return findUser.isPresent() ? findUser.get() : null;
+    }
+
+    @Override
     public List<UserCreateRequestDto> findAllUsers() {
         return List.of();
     }
