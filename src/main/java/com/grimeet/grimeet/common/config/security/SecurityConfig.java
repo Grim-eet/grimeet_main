@@ -79,18 +79,16 @@ public class SecurityConfig {
                                     refreshTokenRepository.save(refreshToken);
                                   });
 
-                          // 쿠키 삭제
-                          removeCookie(response);
-
                           response.setStatus(HttpServletResponse.SC_NO_CONTENT);
                           return;
                         }
 
-                        removeCookie(response);
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                       } catch (Exception e) {
-                        removeCookie(response);
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                      } finally {
+                        // 쿠키 삭제
+                        removeCookie(response);
                       }
                     })
 
