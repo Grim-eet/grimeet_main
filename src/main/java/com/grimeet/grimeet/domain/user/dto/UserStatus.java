@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.user.dto;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -26,6 +28,6 @@ public enum UserStatus {
             }
         }
 
-        throw new IllegalArgumentException("Unknown UserStatus code: " + data);
+        throw new GrimeetException(ExceptionStatus.INVALID_USER_STATUS);
     }
 }

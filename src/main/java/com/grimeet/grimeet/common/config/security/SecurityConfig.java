@@ -1,11 +1,14 @@
 package com.grimeet.grimeet.common.config.security;
 
 import com.grimeet.grimeet.common.filter.TokenAuthenticationFilter;
+import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,8 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -23,6 +24,8 @@ public class SecurityConfig {
 
   private final TokenAuthenticationFilter tokenAuthenticationFilter;
   private final CorsConfig corsConfig;
+  private final RefreshTokenRepository refreshTokenRepository;
+  private final JwtUtil jwtUtil;
 
   /**
    * AuthenticationManager 빈 등록
@@ -55,12 +58,50 @@ public class SecurityConfig {
                     sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authorizeRequests ->
                     authorizeRequests
+                            .requestMatchers("/auth/logout").authenticated()
                             .requestMatchers("/**").permitAll()
                             .anyRequest().authenticated()
             )
             .formLogin(AbstractHttpConfigurer::disable)
+            .logout(logout -> logout
+                    .logoutUrl("/auth/logout")
+                    .logoutSuccessHandler((request, response, authentication) -> {
+                      try {
+                        // 토큰에서 직접 사용자 이메일 추출 시도
+                        String token = jwtUtil.resolveToken(request);
+                        if (token != null && jwtUtil.validateAccessToken(token)) {
+                          String userEmail = jwtUtil.getUsernameFromAccessToken(token);
+
+                          // 기존 로그아웃 로직 수행
+                          refreshTokenRepository.findByEmail(userEmail)
+                                  .ifPresent(refreshToken -> {
+                                    refreshToken.updateToken("");
+                                    refreshTokenRepository.save(refreshToken);
+                                  });
+
+                          response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                          return;
+                        }
+
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                      } catch (Exception e) {
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                      } finally {
+                        // 쿠키 삭제
+                        removeCookie(response);
+                      }
+                    })
+
+            )
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  private static void removeCookie(HttpServletResponse response) {
+    Cookie cookie = new Cookie("Authorization_Access", null);
+    cookie.setMaxAge(0);
+    cookie.setPath("/");
+    response.addCookie(cookie);
   }
 }

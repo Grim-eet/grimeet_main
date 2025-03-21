@@ -45,3 +45,7 @@ jwt:
   refreshExpirationMs: ${GRIM_JWT_REFRESH_EXPIRATION_MS}
   token-prefix: Bearer
   header: Authorization
+
+cookie:
+  maxAge:
+    access: ${GRIM_JWT_EXPIRATION_MS}
