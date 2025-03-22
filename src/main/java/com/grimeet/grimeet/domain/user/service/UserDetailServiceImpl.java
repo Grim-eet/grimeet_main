@@ -1,6 +1,8 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
   }
 
   private User findUserByEmailOrThrow(String userEmail) {
-    return userRepository.findByNickname(userEmail)
-            .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다. email: " + userEmail));
+    return userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
   }
 }

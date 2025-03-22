@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.common.config.oauth;
 
 import com.grimeet.grimeet.domain.user.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,14 +10,11 @@ import java.util.Collection;
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class UserPrincipalDetails implements UserDetails {
-    private final User user;
-    private List<GrantedAuthority> authorities;
 
-    public UserPrincipalDetails(User user, List<GrantedAuthority> authorities) {
-        this.user = user;
-        this.authorities = authorities;
-    }
+    private User user;
+    private List<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

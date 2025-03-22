@@ -26,7 +26,7 @@ public class CorsConfig {
 
     corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "https://*.grimeet.com"));
 
-    corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     corsConfiguration.addExposedHeader("Authorization");
     corsConfiguration.addAllowedHeader("*");
     corsConfiguration.setMaxAge(3600L);

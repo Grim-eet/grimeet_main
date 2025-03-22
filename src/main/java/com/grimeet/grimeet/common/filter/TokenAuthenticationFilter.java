@@ -4,6 +4,7 @@ import com.grimeet.grimeet.common.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,15 +35,41 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
    */
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-    String token = jwtUtil.resolveToken(request);
-    if (token != null && jwtUtil.validateAccessToken(token)) {
-      String username = jwtUtil.getUsernameFromAccessToken(token);
-      UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-      authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-      SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    try {
+      String token = extractTokenFromCookie(request);
+      if(token == null) {
+        token = jwtUtil.resolveToken(request);
+      }
+      if (token != null && jwtUtil.validateAccessToken(token)) {
+        String username = jwtUtil.getUsernameFromAccessToken(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+      }
+    } catch (Exception e) {
+      // 토큰 처리 중 발생한 예외를 로깅하지만, 필터 체인은 계속 진행
+      logger.error("Cannot set user authentication: " + e.getMessage());
+      SecurityContextHolder.clearContext(); // 인증 컨텍스트 초기화
     }
     filterChain.doFilter(request, response);
+  }
 
+  /**
+   * Cookie에서 Token 추출
+   * @param request
+   * @return cookie에 저장된 token
+   */
+  private String extractTokenFromCookie(HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for(Cookie cookie : cookies) {
+        if("Authorization_Access".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
   }
 }

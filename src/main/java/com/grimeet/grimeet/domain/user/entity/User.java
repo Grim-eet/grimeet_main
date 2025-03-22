@@ -11,7 +11,9 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "USERS")
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = true) // EqualsAndHashCode 어노테이션 추가, of = "id" 옵션 지정
 public class User extends BaseTime {
 
@@ -45,7 +47,6 @@ public class User extends BaseTime {
     @Column(name = "profile_image_key", length = 500, nullable = true, unique = false, updatable = true)
     private String profileImageKey;
 
-    @Builder
     public User(String name, String email, String password, String nickname, String phoneNumber) {
         this.name = name;
         this.email = email;
@@ -55,7 +56,6 @@ public class User extends BaseTime {
         this.userStatus = UserStatus.NORMAL;
     }
 
-    @Builder
     public User(String name, String email, String password, String nickname, String phoneNumber, String profileImageUrl) {
         this.name = name;
         this.email = email;
