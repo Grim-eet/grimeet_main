@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.user.service;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
@@ -8,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -28,49 +29,65 @@ public class UserServiceImpl implements UserService {
         verifyExistsPhoneNumber(createRequestDto.getPhoneNumber());
 
         User createUser = createRequestDto.toEntity(createRequestDto);
-
         User savedUser = userRepository.save(createUser);
 
         return new UserResponseDto(savedUser);
     }
 
-    @Override
-    public Optional<User> findUserByUserId(Long userId) {
-        return Optional.empty();
-    }
+    // 유저 상태 수정
 
+    @Transactional
     @Override
-    public Optional<User> findUserByEmail(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
+    public void updateUserStatusWithdrawal(String email) {
+        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
         }
-        return user;
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.WITHDRAWAL);
     }
 
+    @Transactional
     @Override
-    public Optional<User> findUserByNickname(String nickname) {
-        Optional<User> user = userRepository.findByNickname(nickname);
-        if (!user.isEmpty()) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+    public void updateUserStatusDormant(String email) {
+        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
         }
-        return user;
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.DORMANT);
+    }
+
+    @Transactional
+    @Override
+    public void updateUserStatusNormal(String email) {
+        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.NORMAL);
     }
 
     @Override
-    public Optional<User> findUserByPhoneNumber(String phoneNumber) {
-        return Optional.empty();
-    }
+    public UserResponseDto findUserByEmail(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
-    @Override
-    public List<User> findAllUsers() {
-        return List.of();
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
+        return new UserResponseDto(user);
     }
 
     @Transactional
     @Override
     public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
-        User user = findUserByEmail(requestDto.getEmail()).get();
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         verifyUserStatus(user.getUserStatus());
 
@@ -86,7 +103,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserNickname(UserUpdateNicknameRequestDto requestDto) {
-        User user = findUserByEmail(requestDto.getEmail()).get();
+        Optional<User> optionalUser = userRepository.findUserByEmail(requestDto.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
 
         verifyUserStatus(user.getUserStatus());
         verifySameNickname(user.getNickname(), requestDto.getNickname());
@@ -98,7 +120,12 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto) {
-        User user = findUserByEmail(requestDto.getEmail()).get();
+        Optional<User> optionalUser = userRepository.findUserByEmail(requestDto.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
 
         verifyUserStatus(user.getUserStatus());
         verifySamePhoneNumber(user.getPhoneNumber(), requestDto.getPhoneNumber());
@@ -107,87 +134,69 @@ public class UserServiceImpl implements UserService {
         user.setPhoneNumber(requestDto.getPhoneNumber());
     }
 
-    @Override
-    public void updateDormantUser(String email) {
-
-    }
-
-    @Transactional
-    @Override
-    public void updateWithdrawUser(String email) {
-        User user = findUserByEmail(email).get();
-        user.setUserStatus(UserStatus.WITHDRAWAL);
-
-    }
-
-    @Override
-    public void deleteUser(String email) {
-
-    }
-
     private void verifyExistsEmail(String email) {
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+            throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
         }
     }
 
     private void verifyExistsNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
         }
     }
 
     private void verifyExistsPhoneNumber(String phoneNumber) {
         if (userRepository.existsByNickname(phoneNumber)) {
-            throw new IllegalArgumentException("이미 존재하는 전화번호입니다.");
+            throw new GrimeetException(ExceptionStatus.PHONE_NUMBER_ALREADY_EXISTS);
         }
     }
 
     private void verifyCurrentPassword(String currentPassword, String inputPassword) {
         if (!currentPassword.equals(inputPassword)) {
-            throw new IllegalArgumentException("비밀번호를 잘못 입력했습니다.");
+            throw new GrimeetException(ExceptionStatus.INVALID_USER_LOGIN_INFO);
         }
     }
 
     private void verifyNewPassword(String currentPassword, String newPassword) {
         if (currentPassword.equals(newPassword)) {
-            throw new IllegalArgumentException("기존과 다른 비밀번호를 입력하세요.");
+            throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
         }
     }
 
     private void verifyConfirmPassword(String newPassword, String confirmPassword) {
         if (!confirmPassword.equals(newPassword)) {
-            throw new IllegalArgumentException("입력하신 비밀번호와 다릅니다.");
+            throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
         }
     }
 
     private void verifyUserStatus(UserStatus userStatus) {
         if (userStatus == UserStatus.WITHDRAWAL) {
-            throw new IllegalArgumentException("탈퇴 회원은 비밀번호 변경이 불가합니다.");
+            throw new GrimeetException(ExceptionStatus.INVALID_ROLE);
         }
     }
 
     private void verifySameNickname(String oldNickname, String newNickname) {
         if (oldNickname.equals(newNickname)) {
-            throw new IllegalArgumentException("기존과 같은 닉네임입니다.");
+            throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
         }
     }
 
     private void verifyUniqueNickname(String newNickname) {
         if (userRepository.existsByNickname(newNickname)) {
-            throw new IllegalArgumentException("이미 사용 중인 닉네임입니다.");
+            throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
         }
     }
 
     private void verifySamePhoneNumber(String oldPhoneNumber, String newPhoneNumber) {
         if (oldPhoneNumber.equals(newPhoneNumber)) {
-            throw new IllegalArgumentException("기존과 같은 번호입니다.");
+            throw new GrimeetException(ExceptionStatus.PHONE_NUMBER_ALREADY_EXISTS);
         }
     }
 
     private void verifyUniquePhoneNumber(String phoneNumber) {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new IllegalArgumentException("이미 존재하는 전화번호입니다.");
+            throw new GrimeetException(ExceptionStatus.PHONE_NUMBER_ALREADY_EXISTS);
         }
     }
 

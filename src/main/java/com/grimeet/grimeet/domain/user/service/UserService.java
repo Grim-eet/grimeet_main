@@ -1,32 +1,32 @@
 package com.grimeet.grimeet.domain.user.service;
 
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
-import com.grimeet.grimeet.domain.user.entity.User;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
+    // 회원가입으로 유저 생성
     UserResponseDto createUser(UserCreateRequestDto requestDto);
 
-    Optional<User> findUserByUserId(Long userId);
-    Optional<User> findUserByEmail(String email);
-    Optional<User> findUserByNickname(String nickname);
-    Optional<User> findUserByPhoneNumber(String phoneNumber);
+    // 탈퇴 회원으로 전환
+    void updateUserStatusWithdrawal(String email);
 
-    List<User> findAllUsers();
+    // 휴면 회원으로 전환
+    void updateUserStatusDormant(String email);
 
+    // 일반 회원으로 전환
+    void updateUserStatusNormal(String email);
+
+    // email로 유저 찾기
+    UserResponseDto findUserByEmail(String email);
+
+    // 비밀번호 업데이트
     UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 
+    // 닉네임 업데이트
     void updateUserNickname(UserUpdateNicknameRequestDto requestDto);
-    void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto);
 
-    // 휴면 계정으로 전환
-    void updateDormantUser(String email);
-    // 탈퇴 회원으로 전환
-    void updateWithdrawUser(String email);
-    // User 삭제
-    void deleteUser(String email);
+    // 전화번호 업데이트
+    void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto);
 
 }

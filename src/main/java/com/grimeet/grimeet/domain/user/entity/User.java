@@ -65,4 +65,28 @@ public class User extends BaseTime {
         this.userStatus = UserStatus.NORMAL;
         this.profileImageUrl = profileImageUrl;
     }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void setProfileImageKey(String profileImageKey) {
+        this.profileImageKey = profileImageKey;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }
