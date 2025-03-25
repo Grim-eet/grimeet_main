@@ -20,13 +20,7 @@ public interface UserService {
     // email로 유저 찾기
     UserResponseDto findUserByEmail(String email);
 
-    // 비밀번호 업데이트
-    UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
-
-    // 닉네임 업데이트
-    void updateUserNickname(UserUpdateNicknameRequestDto requestDto);
-
-    // 전화번호 업데이트
-    void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto);
+    // 유저 정보 업데이트
+    UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto);
 
 }
