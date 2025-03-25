@@ -44,20 +44,10 @@ public class UserController {
     }
 
     // 유저 정보 수정: 비밀번호, 닉네임, 전화번호
-    @PatchMapping("/update/password")
-    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdatePasswordRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserPassword(requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    @PatchMapping("/update")
+    public ResponseEntity<UserResponseDto> updateUserInfo(@Valid @RequestBody UserUpdateRequestDto requestDto) {
+        UserResponseDto responseDto = userService.updateUserInfo(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/update/nickname")
-    public ResponseEntity<Void> updateNickname(@Valid @RequestBody UserUpdateNicknameRequestDto requestDto) {
-        userService.updateUserNickname(requestDto);
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/update/phoneNumber")
-    public void updatePhoneNumber(@Valid @RequestBody UserUpdatePhoneNumberRequestDto requestDto) {
-        userService.updateUserPhoneNumber(requestDto);
-    }
 }
