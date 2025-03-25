@@ -21,6 +21,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
 
+    // 유저 생성
     @Transactional
     @Override
     public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
@@ -36,8 +37,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(savedUser);
     }
 
-    // 유저 상태 수정
-
+    // 유저 상태(일반, 휴면, 탈퇴) 업데이트
     @Transactional
     @Override
     public void updateUserStatusWithdrawal(String email) {
@@ -74,6 +74,7 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.NORMAL);
     }
 
+    // 이메일로 유저 찾기
     @Transactional
     @Override
     public UserResponseDto findUserByEmail(String email) {
@@ -86,54 +87,39 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    // 유저 상태 업데이트
     @Transactional
     @Override
-    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
+    public UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
-        userValidator.verifyUserStatus(user.getUserStatus());
-        userValidator.verifyCurrentPassword(user.getPassword(), requestDto.getPassword());
-        userValidator.verifyNewPassword(user.getPassword(), requestDto.getNewPassword());
-        userValidator.verifyConfirmPassword(requestDto.getNewPassword(), requestDto.getConfirmPassword());
+        // 비밀번호 변경
+        if (requestDto.getNewPassword() != null) {
+            userValidator.verifyCurrentPassword(user.getPassword(), requestDto.getCurrentPassword());
+            userValidator.verifyNewPassword(user.getPassword(), requestDto.getNewPassword());
+            userValidator.verifyConfirmPassword(requestDto.getNewPassword(), requestDto.getConfirmPassword());
 
-        user.setPassword(requestDto.getNewPassword());
+            user.setPassword(requestDto.getNewPassword());
+        }
+
+        // 닉네임 변경
+        if (requestDto.getNickname() != null) {
+            userValidator.verifySameNickname(user.getNickname(), requestDto.getNickname());
+            userValidator.verifyUniqueNickname(requestDto.getNickname());
+
+            user.setNickname(requestDto.getNickname());
+        }
+
+        // 전화번호 변경
+        if (requestDto.getPhoneNumber() != null) {
+            userValidator.verifySamePhoneNumber(user.getPhoneNumber(), requestDto.getPhoneNumber());
+            userValidator.verifyUniquePhoneNumber(requestDto.getPhoneNumber());
+
+            user.setPhoneNumber(requestDto.getPhoneNumber());
+        }
 
         return new UserResponseDto(user);
-    }
-
-    @Transactional
-    @Override
-    public void updateUserNickname(UserUpdateNicknameRequestDto requestDto) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(requestDto.getEmail());
-
-        if (optionalUser.isEmpty()) {
-            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-        }
-        User user = optionalUser.get();
-
-        userValidator.verifyUserStatus(user.getUserStatus());
-        userValidator.verifySameNickname(user.getNickname(), requestDto.getNickname());
-        userValidator.verifyUniqueNickname(requestDto.getNickname());
-
-        user.setNickname(requestDto.getNickname());
-    }
-
-    @Transactional
-    @Override
-    public void updateUserPhoneNumber(UserUpdatePhoneNumberRequestDto requestDto) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(requestDto.getEmail());
-
-        if (optionalUser.isEmpty()) {
-            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-        }
-        User user = optionalUser.get();
-
-        userValidator.verifyUserStatus(user.getUserStatus());
-        userValidator.verifySamePhoneNumber(user.getPhoneNumber(), requestDto.getPhoneNumber());
-        userValidator.verifyUniquePhoneNumber(requestDto.getPhoneNumber());
-
-        user.setPhoneNumber(requestDto.getPhoneNumber());
     }
 
 }
