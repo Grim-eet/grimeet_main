@@ -13,10 +13,6 @@ public class UserUpdateRequestDto {
     @Email
     private String email;
 
-    private String currentPassword; // 회원정보 수정 로직(화면) 확인 후 검토
-    private String newPassword;
-    private String confirmPassword;
-
     private String nickname;
 
     private String phoneNumber;

@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.user.dto;
 
+import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -12,21 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserUpdatePasswordRequestDto {
 
-    @NotBlank
     @Email
-    @Size(min = 8, max = 200)
     private String email;
 
-    @NotBlank
-    @Size(min = 8, max = 200)
-    private String password;
+    @PasswordFormat
+    private String currentPassword;
 
-    @NotBlank
-    @Size(min = 8, max = 200)
+    @PasswordFormat
     private String newPassword;
-
-    @NotBlank
-    @Size(min = 8, max = 200)
-    private String confirmPassword;
 
 }
