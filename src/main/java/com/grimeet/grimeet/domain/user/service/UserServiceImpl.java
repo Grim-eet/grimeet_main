@@ -5,9 +5,11 @@ import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // 유저 생성
     @Transactional
@@ -109,13 +112,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
+        verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
 
-        return null;
+        user.setPassword(requestDto.getNewPassword());
+
+        return new UserResponseDto(user);
     }
 
 
-    private void verifyCurrentPasswordMatches()
+    private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
+        if (passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
+        }
+    }
 
     private void verifyUniqueEmail(String email) {
         if (userRepository.existsByEmail(email)) {
