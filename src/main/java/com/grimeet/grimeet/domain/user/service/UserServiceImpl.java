@@ -94,15 +94,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
-        // 비밀번호 변경
-        if (requestDto.getNewPassword() != null) {
-            userValidator.verifyCurrentPassword(user.getPassword(), requestDto.getCurrentPassword());
-            userValidator.verifyNewPassword(user.getPassword(), requestDto.getNewPassword());
-            userValidator.verifyConfirmPassword(requestDto.getNewPassword(), requestDto.getConfirmPassword());
-
-            user.setPassword(requestDto.getNewPassword());
-        }
-
         // 닉네임 변경
         if (requestDto.getNickname() != null) {
             userValidator.verifySameNickname(user.getNickname(), requestDto.getNickname());

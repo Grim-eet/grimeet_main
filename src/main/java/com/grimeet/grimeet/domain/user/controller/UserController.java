@@ -43,11 +43,17 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    // 유저 정보 수정: 비밀번호, 닉네임, 전화번호
+    // 유저 정보 수정: 닉네임, 전화번호
     @PatchMapping("/update")
     public ResponseEntity<UserResponseDto> updateUserInfo(@Valid @RequestBody UserUpdateRequestDto requestDto) {
         UserResponseDto responseDto = userService.updateUserInfo(requestDto);
         return ResponseEntity.ok(responseDto);
+    }
+
+    // 유저 정보 수정
+    @PatchMapping("/update/password")
+    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdateRequestDto requestDto) {
+
     }
 
 }
