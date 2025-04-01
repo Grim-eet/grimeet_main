@@ -8,11 +8,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserUpdateRequestDto {
-    @Email
+
     @NotBlank
+    @Email
     private String email;
 
-    private String currentPassword;
+    private String currentPassword; // 수정 로직 확인 후 수정 예정
     private String newPassword;
     private String confirmPassword;
 
