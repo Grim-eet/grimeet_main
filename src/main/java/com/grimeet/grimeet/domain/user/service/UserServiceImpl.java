@@ -5,6 +5,7 @@ import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.user.validator.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
