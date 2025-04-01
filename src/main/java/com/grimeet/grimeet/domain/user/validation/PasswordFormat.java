@@ -9,7 +9,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = PasswordValidator.class)
 @Documented
-public @interface Password {
+public @interface PasswordFormat {
 
     String message() default "비밀번호가 유효하지 않습니다."; // 예외 처리로 삭제 여부 판단
 

@@ -1,7 +1,7 @@
 package com.grimeet.grimeet.domain.user.dto;
 
 import com.grimeet.grimeet.domain.user.entity.User;
-import com.grimeet.grimeet.domain.user.validation.Password;
+import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class UserCreateRequestDto {
   private String email;
 
   @NotBlank
-  @Password
+  @PasswordFormat
   private String password;
 
   @NotBlank

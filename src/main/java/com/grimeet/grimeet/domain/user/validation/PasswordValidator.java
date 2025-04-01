@@ -3,7 +3,7 @@ package com.grimeet.grimeet.domain.user.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordValidator implements ConstraintValidator<Password, String> {
+public class PasswordValidator implements ConstraintValidator<PasswordFormat, String> {
 
     private int minLength;
     private int maxLength;
@@ -12,7 +12,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/~`|\\\\]).+$";
 
     @Override
-    public void initialize(Password constraintAnnotation) {
+    public void initialize(PasswordFormat constraintAnnotation) {
         this.minLength = constraintAnnotation.minLength();
         this.maxLength = constraintAnnotation.maxLength();
     }
