@@ -96,17 +96,13 @@ public class UserServiceImpl implements UserService {
 
         // 닉네임 변경
         if (requestDto.getNickname() != null) {
-            userValidator.verifySameNickname(user.getNickname(), requestDto.getNickname());
             userValidator.verifyUniqueNickname(requestDto.getNickname());
-
             user.setNickname(requestDto.getNickname());
         }
 
         // 전화번호 변경
         if (requestDto.getPhoneNumber() != null) {
-            userValidator.verifySamePhoneNumber(user.getPhoneNumber(), requestDto.getPhoneNumber());
             userValidator.verifyUniquePhoneNumber(requestDto.getPhoneNumber());
-
             user.setPhoneNumber(requestDto.getPhoneNumber());
         }
 
