@@ -8,7 +8,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     private int minLength;
     private int maxLength;
 
-    private static final String REGEX =
+    private static final String PASSWORD_REGEX =
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-={}\\[\\]:;\"'<>,.?/~`|\\\\]).+$";
 
     @Override
@@ -19,11 +19,17 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
-        if (password == null) return false;
+        if (password == null) {
+            return false;
+        }
 
-        if (password.length() < minLength || password.length() > maxLength) return false;
+        if (password.length() < minLength || password.length() > maxLength) {
+            return false;
+        }
 
-        if (!password.matches(REGEX)) return false;
+        if (!password.matches(PASSWORD_REGEX)) {
+            return false;
+        }
 
         return true;
     }
