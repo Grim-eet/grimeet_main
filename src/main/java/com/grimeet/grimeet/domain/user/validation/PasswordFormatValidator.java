@@ -3,7 +3,7 @@ package com.grimeet.grimeet.domain.user.validation;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class PasswordValidator implements ConstraintValidator<PasswordFormat, String> {
+public class PasswordFormatValidator implements ConstraintValidator<PasswordFormat, String> {
 
     private int minLength;
     private int maxLength;
