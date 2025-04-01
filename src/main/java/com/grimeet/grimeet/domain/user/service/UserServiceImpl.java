@@ -117,14 +117,13 @@ public class UserServiceImpl implements UserService {
 
         verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
 
-        user.setPassword(requestDto.getNewPassword());
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
 
         return new UserResponseDto(user);
     }
 
-
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
-        if (passwordEncoder.matches(rawPassword, encodedPassword)) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
         }
     }
