@@ -23,4 +23,6 @@ public interface UserService {
     // 유저 정보 업데이트
     UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto);
 
+    // 유저 비밀번호 업데이트
+    UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 }

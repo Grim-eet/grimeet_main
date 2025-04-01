@@ -52,8 +52,9 @@ public class UserController {
 
     // 유저 정보 수정
     @PatchMapping("/update/password")
-    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdateRequestDto requestDto) {
-
+    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdatePasswordRequestDto requestDto) {
+        UserResponseDto responseDto = userService.updateUserPassword(requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 
 }
