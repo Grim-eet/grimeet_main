@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.user.validator;
+package com.grimeet.grimeet.domain.user.validation;
 import jakarta.validation.Constraint;
 import java.lang.annotation.*;
 
