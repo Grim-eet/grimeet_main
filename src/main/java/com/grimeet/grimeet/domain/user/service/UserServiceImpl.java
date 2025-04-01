@@ -5,7 +5,6 @@ import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
-import com.grimeet.grimeet.domain.user.validator.UserValidator;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,6 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserValidator userValidator;
 
     // 유저 생성
     @Transactional
@@ -27,9 +25,9 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
         log.info("User Create Request : {}", createRequestDto);
 
-        userValidator.verifyExistsEmail(createRequestDto.getEmail());
-        userValidator.verifyExistsNickname(createRequestDto.getNickname());
-        userValidator.verifyExistsPhoneNumber(createRequestDto.getPhoneNumber());
+        verifyUniqueEmail(createRequestDto.getEmail());
+        verifyUniqueNickname(createRequestDto.getNickname());
+        verifyUniquePhoneNumber(createRequestDto.getPhoneNumber());
 
         User createUser = createRequestDto.toEntity(createRequestDto);
         User savedUser = userRepository.save(createUser);
@@ -96,17 +94,45 @@ public class UserServiceImpl implements UserService {
 
         // 닉네임 변경
         if (requestDto.getNickname() != null) {
-            userValidator.verifyExistsNickname(requestDto.getNickname());
+            verifyUniqueNickname(requestDto.getNickname());
             user.setNickname(requestDto.getNickname());
         }
 
         // 전화번호 변경
         if (requestDto.getPhoneNumber() != null) {
-            userValidator.verifyExistsPhoneNumber(requestDto.getPhoneNumber());
+            verifyUniquePhoneNumber(requestDto.getPhoneNumber());
             user.setPhoneNumber(requestDto.getPhoneNumber());
         }
 
         return new UserResponseDto(user);
+    }
+
+    @Override
+    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
+
+
+        return null;
+    }
+
+
+    private void verifyCurrentPasswordMatches()
+
+    private void verifyUniqueEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
+        }
+    }
+
+    private void verifyUniqueNickname(String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
+        }
+    }
+
+    private void verifyUniquePhoneNumber(String phoneNumber) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new GrimeetException(ExceptionStatus.PHONE_NUMBER_ALREADY_EXISTS);
+        }
     }
 
 }
