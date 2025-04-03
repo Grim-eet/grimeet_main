@@ -33,8 +33,6 @@ public class UserServiceImpl implements UserService {
         verifyUniquePhoneNumber(createRequestDto.getPhoneNumber());
 
         User createdUser = createRequestDto.toEntity(createRequestDto);
-        String profileUrl = "https://api.dicebear.com/9.x/notionists-neutral/svg?seed=";
-        createdUser.setProfileImageUrl(profileUrl + createdUser.getNickname());
         User savedUser = userRepository.save(createdUser);
 
         return new UserResponseDto(savedUser);
