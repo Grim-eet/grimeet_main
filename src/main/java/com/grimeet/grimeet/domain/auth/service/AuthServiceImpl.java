@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
   private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {
     if(userRepository.existsByEmail(userCreateRequestDto.getEmail())) {
-      throw new GrimeetException(ExceptionStatus.LOGIN_ID_ALREADY_EXISTS);
+      throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
     }
     if(userRepository.existsByNickname(userCreateRequestDto.getNickname())) {
       throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);

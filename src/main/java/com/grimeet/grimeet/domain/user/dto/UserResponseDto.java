@@ -1,10 +1,10 @@
 package com.grimeet.grimeet.domain.user.dto;
 
-
-import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
+
+import java.util.Optional;
 
 @Getter
 public class UserResponseDto {
