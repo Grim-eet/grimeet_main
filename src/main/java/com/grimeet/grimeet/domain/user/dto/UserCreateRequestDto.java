@@ -22,7 +22,6 @@ public class UserCreateRequestDto {
   @Schema(description = "이메일(로그인 아이디)", example = "dopalPrincess98@gmail.com")
   @NotBlank
   @Email
-  @Size(max = 200)
   private String email;
 
   @Schema(description = "비밀번호", example = "test1234!#")
