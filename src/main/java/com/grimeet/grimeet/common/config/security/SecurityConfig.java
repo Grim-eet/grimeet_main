@@ -3,6 +3,7 @@ package com.grimeet.grimeet.common.config.security;
 import com.grimeet.grimeet.common.filter.TokenAuthenticationFilter;
 import com.grimeet.grimeet.common.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -82,14 +83,12 @@ public class SecurityConfig {
                           return;
                         }
 
-                        // 인증 객체를 통한 처리 시도
-                        if (authentication != null && authentication.getPrincipal() != null) {
-                          // 기존 로직
-                        }
-
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                       } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                      } finally {
+                        // 쿠키 삭제
+                        removeCookie(response);
                       }
                     })
 
@@ -97,5 +96,12 @@ public class SecurityConfig {
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  private static void removeCookie(HttpServletResponse response) {
+    Cookie cookie = new Cookie("Authorization_Access", null);
+    cookie.setMaxAge(0);
+    cookie.setPath("/");
+    response.addCookie(cookie);
   }
 }

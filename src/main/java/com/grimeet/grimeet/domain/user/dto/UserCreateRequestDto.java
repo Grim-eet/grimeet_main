@@ -1,9 +1,10 @@
 package com.grimeet.grimeet.domain.user.dto;
 
-import com.grimeet.grimeet.domain.user.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
+import com.grimeet.grimeet.domain.user.entity.User;
+import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
+        import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,7 +27,7 @@ public class UserCreateRequestDto {
 
   @Schema(description = "비밀번호", example = "test1234!#")
   @NotBlank
-  @Size(min = 8, max = 200)
+  @PasswordFormat
   private String password;
 
   @Schema(description = "닉네임", example = "zl존두팔S2")

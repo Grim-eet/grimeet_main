@@ -60,3 +60,7 @@ springdoc:
       deep-linking: true
       syntax-highlight:
         activated: true
+
+cookie:
+  maxAge:
+    access: ${GRIM_JWT_EXPIRATION_MS}

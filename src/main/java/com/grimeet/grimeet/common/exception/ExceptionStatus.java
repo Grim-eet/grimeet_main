@@ -14,12 +14,13 @@ public enum ExceptionStatus {
 
   // USER
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "일치하는 유저정보를 찾을 수 없습니다."),
-  LOGIN_ID_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 400, "이미 존재하는 아이디입니다."),
+  EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 400, "이미 존재하는 이메일입니다."),
   NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 400, "이미 존재하는 닉네임입니다."),
+  PHONE_NUMBER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 400, "이미 존재하는 전화번호입니다."),
   INVALID_USER_LOGIN_INFO(HttpStatus.BAD_REQUEST, 400, "아이디 혹은 비밀번호가 일치하지 않습니다."),
+  INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 400, "비밀번호가 유효하지 않습니다."),
   INVALID_ROLE(HttpStatus.FORBIDDEN, 403, "접근할 수 없습니다."),
   INVALID_USER_STATUS(HttpStatus.BAD_REQUEST, 400, "잘못된 유저상태입니다.");
-
 
   private final int status;
   private final int customCode;
