@@ -6,6 +6,9 @@ build/
 !**/src/test/**/build/
 mysql-data/
 
+.github/*
+.DS_Store
+
 ### STS ###
 .apt_generated
 .classpath
