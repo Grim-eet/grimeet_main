@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService {
         verifyUniqueNickname(createRequestDto.getNickname());
         verifyUniquePhoneNumber(createRequestDto.getPhoneNumber());
 
-        User createUser = createRequestDto.toEntity(createRequestDto);
-        User savedUser = userRepository.save(createUser);
+        User createdUser = createRequestDto.toEntity(createRequestDto);
+        User savedUser = userRepository.save(createdUser);
 
         return new UserResponseDto(savedUser);
     }
