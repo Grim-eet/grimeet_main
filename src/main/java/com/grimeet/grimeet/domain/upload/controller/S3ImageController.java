@@ -49,4 +49,13 @@ public class S3ImageController {
         return imageUrl != null && imageUrl.startsWith(DEFAULT_IMAGE_PREFIX);
     }
 
+    /**
+     * 일반 이미지 업로드용
+     */
+//    @PostMapping("/images")
+//    public ResponseEntity<String> uploadPostImage(@RequestPart("image") MultipartFile image) {
+//        String url = s3ImageService.upload(image);
+//        return ResponseEntity.ok(url);
+//    }
+
 }
