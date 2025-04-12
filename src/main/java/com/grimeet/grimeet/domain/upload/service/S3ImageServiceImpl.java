@@ -71,6 +71,7 @@ public class S3ImageServiceImpl implements S3ImageService {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
 
         // 고유한 S3 파일 이름 생성
+        // 타임 스탬프
         String s3FileName = UUID.randomUUID().toString().substring(0, 10) + "_" + originalFilename;
 
         try (
