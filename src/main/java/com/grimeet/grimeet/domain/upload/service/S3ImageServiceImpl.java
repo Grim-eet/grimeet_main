@@ -36,16 +36,21 @@ public class S3ImageServiceImpl implements S3ImageService {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName;
 
-
     @Override
-    public String upload(MultipartFile image) throws IOException {
+    public String upload(MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
             throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
 
         this.validateImageFileExtention(image.getOriginalFilename());
 
-        return this.uploadImageToS3(image);
+        try {
+            return this.uploadImageToS3(image);
+        } catch (IOException e) {
+            log.error("사용자 프로필 이미지 업로드 중 IOException 발생", e);
+            throw new GrimeetException(ExceptionStatus.S3_UPLOAD_FAIL);
+        }
+
     }
 
     private void validateImageFileExtention(String fileName) {
@@ -62,53 +67,53 @@ public class S3ImageServiceImpl implements S3ImageService {
         }
     }
 
-    public String uploadImageToS3(MultipartFile image) throws IOException{
+    private String uploadImageToS3(MultipartFile image) throws IOException{
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
 
-        String extention = originalFilename.substring(originalFilename.lastIndexOf(".")); //확장자 명
+        // 고유한 S3 파일 이름 생성
+        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + "_" + originalFilename;
 
-        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + originalFilename; //변경된 파일 명
+        try (
+            InputStream inputStream = image.getInputStream();
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream))
+        ) {
+            ObjectMetadata metadata = new ObjectMetadata();
 
-        InputStream is = image.getInputStream();
-        byte[] bytes = IOUtils.toByteArray(is);
+            // Content-Type 설정
+            String contentType = image.getContentType();
+            if (contentType != null) {
+                metadata.setContentType(contentType);
+            }
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType("image/" + extention);
-        metadata.setContentLength(bytes.length);
-        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+            metadata.setContentLength(byteArrayInputStream.available());
 
-        try {
-            PutObjectRequest putObjectRequest =
-                    new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
+            // S3에 업로드
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead);
-            amazonS3.putObject(putObjectRequest); // put image to S3
+            amazonS3.putObject(putObjectRequest);
 
-        } catch (Exception e){
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
+            // S3 URL 변환
+            return amazonS3.getUrl(bucketName, s3FileName).toString();
 
-        } finally {
-            byteArrayInputStream.close();
-            is.close();
+        } catch (IOException e){
+            log.error("사용자 프로필 이미지 업로드 중 IOException 발생", e);
+            throw new GrimeetException(ExceptionStatus.S3_UPLOAD_FAIL);
         }
 
-        return amazonS3.getUrl(bucketName, s3FileName).toString();
     }
 
     @Override
     public void deleteImageFromS3(String imageAddress) {
         String key = getKeyFromImageAddress(imageAddress);
         try {
-
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
-
         } catch (Exception e){
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
+            throw new GrimeetException(ExceptionStatus.S3_DELETE_FAIL);
         }
     }
 
     private String getKeyFromImageAddress(String imageAddress){
         try {
-
             URL url = new URL(imageAddress);
             String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
             return decodingKey.substring(1); // 맨 앞의 '/' 제거
