@@ -39,3 +39,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### application-private ###
+src/main/resources/application-private.yml
