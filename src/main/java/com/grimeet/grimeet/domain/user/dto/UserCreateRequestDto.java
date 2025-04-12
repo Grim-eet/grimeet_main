@@ -12,17 +12,17 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "신규 사용자 생성 요청 DTO")
 public class UserCreateRequestDto {
 
-  @Schema(description = "사용자 이름", example = "곽두팔")
+  @Schema(description = "사용자 이름", example = "홍길동")
   @NotBlank
   @Size(min = 2, max = 50)
   private String name;
 
-  @Schema(description = "이메일(로그인 아이디)", example = "dopalPrincess98@gmail.com")
+  @Schema(description = "이메일(로그인 아이디)", example = "testUser@example.com")
   @NotBlank
   @Email
-  @Size(max = 200)
   private String email;
 
   @Schema(description = "비밀번호", example = "test1234!#")
@@ -30,7 +30,7 @@ public class UserCreateRequestDto {
   @PasswordFormat
   private String password;
 
-  @Schema(description = "닉네임", example = "zl존두팔S2")
+  @Schema(description = "닉네임", example = "둘리")
   @NotBlank
   @Size(min = 2, max = 50)
   private String nickname;
