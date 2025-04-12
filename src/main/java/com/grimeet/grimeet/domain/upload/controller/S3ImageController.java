@@ -48,4 +48,5 @@ public class S3ImageController {
     private boolean isDefaultProfileImage(String imageUrl) {
         return imageUrl != null && imageUrl.startsWith(DEFAULT_IMAGE_PREFIX);
     }
+
 }
