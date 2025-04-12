@@ -18,8 +18,8 @@ spring:
   sql:
     init:
       mode: always
-    # profile:
-    # include: oauth, mail, s3, payments
+  profile:
+    include: s3
   data:
     redis:
     host: localhost
