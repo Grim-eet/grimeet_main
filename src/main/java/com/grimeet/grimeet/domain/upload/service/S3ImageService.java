@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public interface S3ImageService {
 
-    String upload(MultipartFile image) throws IOException;
+    String upload(MultipartFile image);
 
     void deleteImageFromS3(String imageAddress);
 
