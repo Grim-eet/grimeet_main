@@ -10,4 +10,7 @@ public interface S3ImageService {
 
     void deleteImageFromS3(String imageAddress);
 
+    void deleteIfNotDefault(String imageUrl);
+
+    String extractKeyFromUrl(String imageUrl);
 }

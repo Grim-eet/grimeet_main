@@ -9,8 +9,6 @@ import com.amazonaws.util.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -46,7 +44,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         try {
             return this.uploadImageToS3(image);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("사용자 프로필 이미지 업로드 중 IOException 발생", e);
             throw new GrimeetException(ExceptionStatus.S3_UPLOAD_FAIL);
         }
@@ -67,12 +65,17 @@ public class S3ImageServiceImpl implements S3ImageService {
         }
     }
 
-    private String uploadImageToS3(MultipartFile image) throws IOException{
+    private String uploadImageToS3(MultipartFile image) {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
 
         // 고유한 S3 파일 이름 생성
         // 타임 스탬프
-        String s3FileName = UUID.randomUUID().toString().substring(0, 10) + "_" + originalFilename;
+        String prefix = "profile/";
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String randomSuffix = UUID.randomUUID().toString().substring(0, 5); // 5자리 정도
+
+        String s3FileName = prefix + timestamp + "_" + randomSuffix + "_" + originalFilename;
 
         try (
             InputStream inputStream = image.getInputStream();
@@ -97,7 +100,7 @@ public class S3ImageServiceImpl implements S3ImageService {
             return amazonS3.getUrl(bucketName, s3FileName).toString();
 
         } catch (IOException e){
-            log.error("사용자 프로필 이미지 업로드 중 IOException 발생", e);
+            log.error("S3 업로드 실패 - 파일명: {}, 예외: {}", originalFilename, e.toString());
             throw new GrimeetException(ExceptionStatus.S3_UPLOAD_FAIL);
         }
 
@@ -105,7 +108,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
     @Override
     public void deleteImageFromS3(String imageAddress) {
-        String key = getKeyFromImageAddress(imageAddress);
+        String key = extractKeyFromUrl(imageAddress);
         try {
             amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
         } catch (Exception e){
@@ -113,13 +116,28 @@ public class S3ImageServiceImpl implements S3ImageService {
         }
     }
 
-    private String getKeyFromImageAddress(String imageAddress){
-        try {
-            URL url = new URL(imageAddress);
-            String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
-            return decodingKey.substring(1); // 맨 앞의 '/' 제거
+    @Override
+    public void deleteIfNotDefault(String imageUrl) {
+        if (imageUrl != null && !isCustomProfileImage(imageUrl)) {
+            deleteImageFromS3(imageUrl);
+            log.info("기존 프로필 이미지 삭제 완료: {}", imageUrl);
+        } else {
+            log.info("기본 프로필 이미지여서 삭제 생략: {}", imageUrl);
+        }
+    }
 
-        } catch (MalformedURLException | UnsupportedEncodingException e){
+    private boolean isCustomProfileImage(String imageUrl) {
+        return imageUrl != null && !imageUrl.startsWith("https://api.dicebear.com");
+    }
+
+    @Override
+    public String extractKeyFromUrl(String imageUrl) {
+        try {
+            URL url = new URL(imageUrl);
+            String decodedPath = URLDecoder.decode(url.getPath(), "UTF-8");
+            return decodedPath.substring(1);
+        } catch (Exception e) {
+            log.error("S3 키 추출 실패 - URL: {}, 예외: {}", imageUrl, e.toString());
             throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
     }
