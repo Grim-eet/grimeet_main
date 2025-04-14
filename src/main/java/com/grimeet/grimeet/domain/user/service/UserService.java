@@ -8,9 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
-    // 회원가입으로 유저 생성
-    UserResponseDto createUser(UserCreateRequestDto requestDto);
-
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
 

@@ -25,23 +25,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final S3ImageService s3ImageService;
-    private final JavaInfoContributor javaInfoContributor;
-
-    // 유저 생성
-    @Transactional
-    @Override
-    public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
-        log.info("User Create Request : {}", createRequestDto);
-
-        verifyUniqueEmail(createRequestDto.getEmail());
-        verifyUniqueNickname(createRequestDto.getNickname());
-        verifyUniquePhoneNumber(createRequestDto.getPhoneNumber());
-
-        User createdUser = createRequestDto.toEntity(createRequestDto);
-        User savedUser = userRepository.save(createdUser);
-
-        return new UserResponseDto(savedUser);
-    }
 
     // 유저 상태(일반, 휴면, 탈퇴) 업데이트
     @Transactional

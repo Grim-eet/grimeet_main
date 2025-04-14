@@ -40,13 +40,18 @@ public class UserCreateRequestDto {
   @Size(max = 15)
   private String phoneNumber;
 
-  public User toEntity(UserCreateRequestDto userCreateRequestDto) {
+  public User toEntity(UserCreateRequestDto userCreateRequestDto, String encryptedPassword) {
+    String profileUrl = "https://api.dicebear.com/9.x/notionists-neutral/svg?seed=" + userCreateRequestDto.getNickname();
+
     return User.builder()
             .name(userCreateRequestDto.getName())
             .email(userCreateRequestDto.getEmail())
-            .password(userCreateRequestDto.getPassword())
+            .password(encryptedPassword)
             .nickname(userCreateRequestDto.getNickname())
             .phoneNumber(userCreateRequestDto.getPhoneNumber())
+            .userStatus(UserStatus.NORMAL)
+            .profileImageUrl(profileUrl)
+            .profileImageKey(null)
             .build();
   }
 }

@@ -23,17 +23,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "사용자 등록", description = "신규 사용자를 등록합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "사용자 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "중복된 이메일, 닉네임 또는 전화번호입니다.", content = @Content),
-    })
-    @PostMapping("/create")
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody UserCreateRequestDto userCreateRequestDto ) {
-        UserResponseDto responseDto = userService.createUser(userCreateRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
-
     @Operation(summary = "탈퇴 회원으로 전환", description = "사용자 상태를 'WITHDRAWAL'로 변경합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "상태 변경 완료", content = @Content),
