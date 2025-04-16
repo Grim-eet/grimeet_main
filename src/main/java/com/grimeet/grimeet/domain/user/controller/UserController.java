@@ -93,4 +93,5 @@ public class UserController {
         UserResponseDto responseDto = userService.updateUserProfileImage(requestDto);
         return ResponseEntity.ok(responseDto);
     }
+
 }
