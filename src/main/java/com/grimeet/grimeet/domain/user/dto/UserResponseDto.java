@@ -43,7 +43,6 @@ public class UserResponseDto {
         this.nickname = user.getNickname();
         this.phoneNumber = user.getPhoneNumber();
         this.profileImageUrl = user.getProfileImageUrl();
-        this.profileImageKey = user.getProfileImageKey();
         this.userStatus = user.getUserStatus();
     }
 
@@ -55,7 +54,6 @@ public class UserResponseDto {
                 .nickname(userResponseDto.getNickname())
                 .phoneNumber(userResponseDto.getPhoneNumber())
                 .profileImageUrl(userResponseDto.getProfileImageUrl())
-                .profileImageKey(userResponseDto.getProfileImageKey())
                 .userStatus(userResponseDto.getUserStatus())
                 .build();
     }
