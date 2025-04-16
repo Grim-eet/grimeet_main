@@ -98,6 +98,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
@@ -110,6 +111,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
