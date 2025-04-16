@@ -130,16 +130,9 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
-
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
-        }
-    }
-
-    private void verifyUniqueEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
         }
     }
 
