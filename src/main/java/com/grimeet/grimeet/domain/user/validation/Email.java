@@ -1,7 +1,6 @@
 package com.grimeet.grimeet.domain.user.validation;
 
 import jakarta.validation.Constraint;
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
 import java.lang.annotation.*;
 

@@ -2,9 +2,10 @@ package com.grimeet.grimeet.domain.user.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-
+import org.springframework.stereotype.Component;
 import java.util.regex.Pattern;
 
+@Component
 public class EmailValidator implements ConstraintValidator<Email, String> {
 
     private static final String EMAIL_REGEX =
@@ -18,11 +19,7 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
             return false;
         }
 
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            return false;
-        }
-
-        return true;
+        return EMAIL_PATTERN.matcher(email).matches();
     }
 
 }
