@@ -7,6 +7,7 @@ import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -82,8 +83,16 @@ public class UserLogServiceImpl implements UserLogService {
 
   @Override
   public List<UserLogResponseDto> findAllUserLogsForDormantCheck() {
+    LocalDate now = LocalDate.now();
+    List<UserLog> userLogs = userLogRepository.findByNextDormantCheckDateLessThanEqual(now);
 
-    return List.of();
+    if (userLogs.isEmpty()) {
+      log.info("[휴면 사용자 조회] 대상 없음 (기준일자: {})", now);
+      return List.of();
+    }
+
+    log.info("[휴면 사용자 조회] 기준일자: {}, 대상자 수: {}", now, userLogs.size());
+    return userLogs.stream().map(UserLogResponseDto::new).toList();
   }
 
   @Override
