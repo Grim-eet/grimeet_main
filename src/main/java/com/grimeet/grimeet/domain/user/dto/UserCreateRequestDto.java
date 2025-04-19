@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.user.dto;
 
+import com.grimeet.grimeet.common.image.ProfileImageDefaults;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
@@ -50,7 +51,7 @@ public class UserCreateRequestDto {
             .nickname(userCreateRequestDto.getNickname())
             .phoneNumber(userCreateRequestDto.getPhoneNumber())
             .userStatus(UserStatus.NORMAL)
-            .profileImageUrl(profileUrl)
+            .profileImageUrl(ProfileImageDefaults.generateProfileImageUrl(userCreateRequestDto.getNickname()))
             .profileImageKey(null)
             .build();
   }
