@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -26,7 +27,23 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final S3ImageService s3ImageService;
 
-    // 유저 상태(일반, 휴면, 탈퇴) 업데이트
+    // email로 유저 찾기
+    @Transactional
+    @Override
+    public User findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+        return user;
+    }
+
+    // 전체 유저 조회
+    @Transactional
+    @Override
+    public List<UserCreateRequestDto> findAllUsers() {
+        return List.of();
+    }
+
+    // 유저 상태 탈퇴 전환
     @Transactional
     @Override
     public void updateUserStatusWithdrawal(String email) {
@@ -39,6 +56,7 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.WITHDRAWAL);
     }
 
+    // 유저 상태 휴면 전환
     @Transactional
     @Override
     public void updateUserStatusDormant(String email) {
@@ -51,6 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.DORMANT);
     }
 
+    // 유저 상태 일반 전환
     @Transactional
     @Override
     public void updateUserStatusNormal(String email) {
@@ -62,35 +81,8 @@ public class UserServiceImpl implements UserService {
         User user = optionalUser.get();
         user.setUserStatus(UserStatus.NORMAL);
     }
-
-    // 이메일로 유저 찾기
-    @Transactional
-    @Override
-    public UserResponseDto findUserByEmail(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-        }
-        User user = optionalUser.get();
-        return new UserResponseDto(user);
-    }
-
-    
-    @Transactional
-    @Override
-    public UserResponseDto findUserByUserEmail(String email) {
-        Optional<UserResponseDto> findUser = userRepository.findByEmail(email);
-        return findUser.isPresent() ? findUser.get() : null;
-    }
-
-    @Transactional
-    @Override
-    public List<UserCreateRequestDto> findAllUsers() {
-        return List.of();
-    }
       
-    // 유저 상태 업데이트
+    // 유저 정보 업데이트
     @Transactional
     @Override
     public UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto) {
@@ -112,6 +104,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    // 유저 비밀번호 업데이트
     @Transactional
     @Override
     public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
@@ -125,6 +118,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    // 유저 프로필 이미지 변경
     @Transactional
     @Override
     public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
@@ -142,6 +136,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    // 유저 프로필 이미지 삭제
     @Transactional
     @Override
     public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
