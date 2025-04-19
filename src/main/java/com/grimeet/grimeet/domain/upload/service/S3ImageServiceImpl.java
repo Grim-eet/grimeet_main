@@ -99,11 +99,11 @@ public class S3ImageServiceImpl implements S3ImageService {
     private ImageUploadResult uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
         String contentType = image.getContentType();
-        String extension = extractExtension(originalFilename);
+        String extension = extractExtension(originalFilename); // (예정) 서버 관리 비용 -> 확장자 webp 변환 후 저장
 
         // 고유한 S3 파일 이름 생성
         // 타임 스탬프
-        String prefix = "profile/" + extension + "/";
+        String prefix = "profile/"; // (예정) 디렉토리 분산 설계 -> 파일 수 균등화 진행 예정
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String randomSuffix = UUID.randomUUID().toString().substring(0, 5);
         String s3FileName = prefix + timestamp + "_" + randomSuffix + "_" + originalFilename;
