@@ -28,7 +28,7 @@ public class UserLogServiceImpl implements UserLogService {
    */
   @Override
   public UserLogResponseDto createUserLog(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
+    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
     LocalDate now = LocalDate.now();
     UserLog userLog = UserLog.builder()
             .lastLoginAt(now)
@@ -58,7 +58,7 @@ public class UserLogServiceImpl implements UserLogService {
    */
   @Override
   public UserLogResponseDto updateUserLogByLogin(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
+    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
     UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
 
     LocalDate now = LocalDate.now();
@@ -70,7 +70,7 @@ public class UserLogServiceImpl implements UserLogService {
 
   @Override
   public UserLogResponseDto updateUserLogByPassword(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
+    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
     UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
 
     LocalDate now = LocalDate.now();
