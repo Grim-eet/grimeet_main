@@ -28,4 +28,8 @@ public interface UserService {
 
     // 유저 프로필 이미지 변경
     UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto);
+
+    // 유저 프로필 이미지 삭제
+    void deleteUserProfileImage(String email);
+
 }

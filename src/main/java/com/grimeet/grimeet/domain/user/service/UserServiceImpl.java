@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         String currentImageKey = user.getProfileImageKey();
         s3ImageService.deleteImageFromS3(currentImageKey);
 
-         ImageUploadResult imageUploadResult = s3ImageService.upload(image);
+        ImageUploadResult imageUploadResult = s3ImageService.upload(image);
 
         user.setProfileImageUrl(imageUploadResult.getUrl());
         user.setProfileImageKey(imageUploadResult.getKey());
