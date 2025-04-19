@@ -1,10 +1,6 @@
 package com.grimeet.grimeet.domain.user.service;
 
-import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 

@@ -2,7 +2,7 @@ package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.common.image.ProfileImageDefaults;
+import com.grimeet.grimeet.common.image.ProfileImageUtils;
 import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
         s3ImageService.deleteImageFromS3(user.getProfileImageKey());
 
         // 기본 이미지로 재설정
-        user.setProfileImageUrl(ProfileImageDefaults.generateProfileImageUrl(user.getNickname()));
+        user.setProfileImageUrl(ProfileImageUtils.generateProfileImageUrl(user.getNickname()));
         user.setProfileImageKey(null);
     }
 
