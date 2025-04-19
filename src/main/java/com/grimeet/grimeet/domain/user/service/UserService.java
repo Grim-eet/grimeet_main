@@ -9,7 +9,14 @@ public interface UserService {
 
     // 휴면 회원으로 전환
     void updateUserStatusDormant(String email);
-
+    
+    // 이메일로 유저 찾기
+    Optional<UserCreateRequestDto> findUserByEmail(String email);
+  
+    UserResponseDto findUserByUserEmail(String email);
+  
+    List<UserCreateRequestDto> findAllUsers();
+  
     // 일반 회원으로 전환
     void updateUserStatusNormal(String email);
 

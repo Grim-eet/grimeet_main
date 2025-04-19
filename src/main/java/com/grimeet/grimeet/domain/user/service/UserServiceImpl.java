@@ -76,6 +76,20 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    
+    @Transactional
+    @Override
+    public UserResponseDto findUserByUserEmail(String email) {
+        Optional<UserResponseDto> findUser = userRepository.findByEmail(email);
+        return findUser.isPresent() ? findUser.get() : null;
+    }
+
+    @Transactional
+    @Override
+    public List<UserCreateRequestDto> findAllUsers() {
+        return List.of();
+    }
+      
     // 유저 상태 업데이트
     @Transactional
     @Override
