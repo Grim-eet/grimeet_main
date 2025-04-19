@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
+    public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
@@ -139,6 +139,8 @@ public class UserServiceImpl implements UserService {
         // 기본 이미지로 재설정
         user.setProfileImageUrl(ProfileImageUtils.generateProfileImageUrl(user.getNickname()));
         user.setProfileImageKey(null);
+
+        return new UserResponseDto(user);
     }
 
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {

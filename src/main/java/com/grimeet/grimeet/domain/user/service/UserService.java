@@ -26,6 +26,6 @@ public interface UserService {
     UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto);
 
     // 유저 프로필 이미지 삭제
-    void deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto);
+    UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto);
 
 }
