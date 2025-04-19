@@ -125,7 +125,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
             String uploadedUrl = amazonS3.getUrl(bucketName, s3FileName).toString();
             log.info("이미지 업로드 완료 - URL: {}", uploadedUrl);
-            return new ImageUploadResult(uploadedUrl, extractKeyFromUrl(uploadedUrl));
+            return new ImageUploadResult(uploadedUrl, s3FileName);
 
         } catch (IOException e) {
             log.error("이미지 파일 업로드 중 IOException 발생 - 파일명: {}, 예외: {}", originalFilename, e.getMessage(), e);
@@ -140,17 +140,6 @@ public class S3ImageServiceImpl implements S3ImageService {
             return "";
         }
         return fileName.substring(lastDotIndex + 1).toLowerCase();
-    }
-
-    public String extractKeyFromUrl(String imageUrl) {
-        try {
-            URL url = new URL(imageUrl);
-            String decodedPath = URLDecoder.decode(url.getPath(), "UTF-8");
-            return decodedPath.substring(1);
-        } catch (Exception e) {
-            log.error("S3 키 추출 실패 - URL: {}, 예외: {}", imageUrl, e.toString());
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
-        }
     }
 
 }
