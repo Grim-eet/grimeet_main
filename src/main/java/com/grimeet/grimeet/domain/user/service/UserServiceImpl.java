@@ -2,15 +2,18 @@ package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
+import com.grimeet.grimeet.common.image.ProfileImageUtils;
+import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
+import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
-import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
@@ -21,22 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    // 유저 생성
-    @Transactional
-    @Override
-    public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
-        log.info("User Create Request : {}", createRequestDto);
-
-        verifyUniqueEmail(createRequestDto.getEmail());
-        verifyUniqueNickname(createRequestDto.getNickname());
-        verifyUniquePhoneNumber(createRequestDto.getPhoneNumber());
-
-        User createdUser = createRequestDto.toEntity(createRequestDto);
-        User savedUser = userRepository.save(createdUser);
-
-        return new UserResponseDto(savedUser);
-    }
+    private final S3ImageService s3ImageService;
 
     // 유저 상태(일반, 휴면, 탈퇴) 업데이트
     @Transactional
@@ -110,6 +98,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
     @Override
     public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
         User user = userRepository.findByEmail(requestDto.getEmail())
@@ -122,15 +111,41 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
+    @Override
+    public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+        MultipartFile image = requestDto.getImage();
+
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+
+        ImageUploadResult imageUploadResult = s3ImageService.upload(image);
+
+        user.setProfileImageUrl(imageUploadResult.getUrl());
+        user.setProfileImageKey(imageUploadResult.getKey());
+
+        return new UserResponseDto(user);
+    }
+
+    @Transactional
+    @Override
+    public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+
+        // 기본 이미지로 재설정
+        user.setProfileImageUrl(ProfileImageUtils.generateProfileImageUrl(user.getNickname()));
+        user.setProfileImageKey(null);
+
+        return new UserResponseDto(user);
+    }
+
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
-        }
-    }
-
-    private void verifyUniqueEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
         }
     }
 

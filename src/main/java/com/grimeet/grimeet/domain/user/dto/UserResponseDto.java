@@ -29,6 +29,9 @@ public class UserResponseDto {
     @Schema(description = "프로필 이미지 Url", example = "profileImage")
     private String profileImageUrl;
 
+    @Schema(description = "프로필 이미지 key")
+    private String profileImageKey;
+
     @Schema(description = "사용자 상태 (NORMAL: 일반, SOCIAL: 소셜, DORMANT: 휴면, WITHDRAWAL: 탈퇴", example = "NORMAL")
     private UserStatus userStatus;
 
