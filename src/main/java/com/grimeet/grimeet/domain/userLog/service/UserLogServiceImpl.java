@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class UserLogServiceImpl implements UserLogService {
   @Override
   public UserLogResponseDto createUserLog(String userEmail) {
     UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
-    Date now = new Date();
+    LocalDate now = LocalDate.now();
     UserLog userLog = UserLog.builder()
             .lastLoginAt(now)
             .changedPasswordAt(now)
@@ -62,7 +61,7 @@ public class UserLogServiceImpl implements UserLogService {
     UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
     UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
 
-    Date now = new Date();
+    LocalDate now = LocalDate.now();
     userLog.updateLastLoginAt(now);
     userLog.updateNextDormantCheckDate(updateNextDormantCheckDate(now));
     UserLog updatedUserLog = userLogRepository.save(userLog);
@@ -74,7 +73,7 @@ public class UserLogServiceImpl implements UserLogService {
     UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
     UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
 
-    Date now = new Date();
+    LocalDate now = LocalDate.now();
     userLog.updateChangedPasswordAt(now);
     userLog.updateNextNotificationDate(updateNextNotificationDate(now));
     UserLog updatedUserLog = userLogRepository.save(userLog);
@@ -98,13 +97,11 @@ public class UserLogServiceImpl implements UserLogService {
    * @param days
    * @return Date
    */
-  private Date addDays(Date date, int days) {
-    // Date -> LocalDate(서버 기본 시간대)
-    LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+  private LocalDate addDays(LocalDate date, int days) {
     // LocalDate에 일자 추가
-    LocalDate result = localDate.plusDays(days);
+    LocalDate result = date.plusDays(days);
     // LocalDate -> Date
-    return Date.from(result.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    return result;
   }
 
   /**
@@ -112,7 +109,7 @@ public class UserLogServiceImpl implements UserLogService {
    * @param date
    * @return Date
    */
-  private Date updateNextDormantCheckDate(Date date) {
+  private LocalDate updateNextDormantCheckDate(LocalDate date) {
     return addDays(date, 365);
   }
 
@@ -121,7 +118,7 @@ public class UserLogServiceImpl implements UserLogService {
    * @param date
    * @return Date
    */
-  private Date updateNextNotificationDate(Date date) {
+  private LocalDate updateNextNotificationDate(LocalDate date) {
     return addDays(date, 90);
   }
 }
