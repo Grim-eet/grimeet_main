@@ -20,12 +20,7 @@ public enum ExceptionStatus {
   INVALID_USER_LOGIN_INFO(HttpStatus.BAD_REQUEST, 400, "아이디 혹은 비밀번호가 일치하지 않습니다."),
   INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 400, "비밀번호가 유효하지 않습니다."),
   INVALID_ROLE(HttpStatus.FORBIDDEN, 403, "접근할 수 없습니다."),
-  INVALID_USER_STATUS(HttpStatus.BAD_REQUEST, 400, "잘못된 유저상태입니다."),
-
-  //UPLOAD
-  INVALID_FILE(HttpStatus.BAD_REQUEST, 400, "유효하지 않은 이미지입니다."),
-  S3_UPLOAD_FAIL(HttpStatus.BAD_REQUEST, 400, "S3 이미지 업로드에 실패했습니다."),
-  S3_DELETE_FAIL(HttpStatus.BAD_REQUEST, 400, "S3 이미지 삭제에 실패했습니다.");
+  INVALID_USER_STATUS(HttpStatus.BAD_REQUEST, 400, "잘못된 유저상태입니다.");
 
   private final int status;
   private final int customCode;

@@ -18,6 +18,8 @@ spring:
   sql:
     init:
       mode: always
+    # profile:
+    # include: oauth, mail, s3, payments
   data:
     redis:
     host: localhost
@@ -31,17 +33,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-cloud:
-  aws:
-    credentials:
-      accessKey: ${GRIM_AWS_ACCESS_KEY}
-      secretKey: ${GRIM_AWS_SECRET_KEY}
-    region:
-      static: ${GRIM_AWS_REGION}
-    s3:
-      bucketName: ${GRIM_AWS_BUCKET}
-    stack:
-      auto: false
 
 server:
   port: 8081
@@ -73,4 +64,3 @@ springdoc:
 cookie:
   maxAge:
     access: ${GRIM_JWT_EXPIRATION_MS}
-

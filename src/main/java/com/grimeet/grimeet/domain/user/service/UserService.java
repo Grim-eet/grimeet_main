@@ -1,8 +1,12 @@
 package com.grimeet.grimeet.domain.user.service;
 
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 
 public interface UserService {
+
+    // 회원가입으로 유저 생성
+    UserResponseDto createUser(UserCreateRequestDto requestDto);
 
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
@@ -21,11 +25,4 @@ public interface UserService {
 
     // 유저 비밀번호 업데이트
     UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
-
-    // 유저 프로필 이미지 변경
-    UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto);
-
-    // 유저 프로필 이미지 삭제
-    UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto);
-
 }

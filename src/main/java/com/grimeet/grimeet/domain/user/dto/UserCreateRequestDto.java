@@ -1,6 +1,5 @@
 package com.grimeet.grimeet.domain.user.dto;
 
-import com.grimeet.grimeet.common.image.ProfileImageUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
@@ -13,15 +12,14 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "신규 사용자 생성 요청 DTO")
 public class UserCreateRequestDto {
 
-  @Schema(description = "사용자 이름", example = "홍길동")
+  @Schema(description = "사용자 이름", example = "곽두팔")
   @NotBlank
   @Size(min = 2, max = 50)
   private String name;
 
-  @Schema(description = "이메일(로그인 아이디)", example = "testUser@example.com")
+  @Schema(description = "이메일(로그인 아이디)", example = "dopalPrincess98@gmail.com")
   @NotBlank
   @Email
   private String email;
@@ -31,7 +29,7 @@ public class UserCreateRequestDto {
   @PasswordFormat
   private String password;
 
-  @Schema(description = "닉네임", example = "둘리")
+  @Schema(description = "닉네임", example = "zl존두팔S2")
   @NotBlank
   @Size(min = 2, max = 50)
   private String nickname;
@@ -41,16 +39,13 @@ public class UserCreateRequestDto {
   @Size(max = 15)
   private String phoneNumber;
 
-  public User toEntity(UserCreateRequestDto userCreateRequestDto, String encryptedPassword) {
+  public User toEntity(UserCreateRequestDto userCreateRequestDto) {
     return User.builder()
             .name(userCreateRequestDto.getName())
             .email(userCreateRequestDto.getEmail())
-            .password(encryptedPassword)
+            .password(userCreateRequestDto.getPassword())
             .nickname(userCreateRequestDto.getNickname())
             .phoneNumber(userCreateRequestDto.getPhoneNumber())
-            .userStatus(UserStatus.NORMAL)
-            .profileImageUrl(ProfileImageUtils.generateProfileImageUrl(userCreateRequestDto.getNickname()))
-            .profileImageKey(null)
             .build();
   }
 }

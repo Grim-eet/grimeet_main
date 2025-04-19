@@ -39,7 +39,17 @@ public class AuthServiceImpl implements AuthService {
 
     String encryptedPassword = passwordEncoder.encode(userCreateRequestDto.getPassword());
 
-    User createdUser = userCreateRequestDto.toEntity(userCreateRequestDto, encryptedPassword);
+    String profileUrl = "https://api.dicebear.com/9.x/notionists-neutral/svg?seed=";
+
+    User createdUser = User.builder()
+            .name(userCreateRequestDto.getName())
+            .email(userCreateRequestDto.getEmail())
+            .password(encryptedPassword)
+            .nickname(userCreateRequestDto.getNickname())
+            .phoneNumber(userCreateRequestDto.getPhoneNumber())
+            .userStatus(UserStatus.NORMAL)
+            .profileImageUrl(profileUrl + userCreateRequestDto.getNickname())
+            .build();
 
     userRepository.save(createdUser);
 
