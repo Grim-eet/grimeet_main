@@ -71,31 +71,6 @@ public class S3ImageServiceImpl implements S3ImageService {
         }
     }
 
-    // 확장자 검증
-    private void validateImageFileExtension(String fileName) {
-        int lastDotIndex = fileName.lastIndexOf(".");
-        if (lastDotIndex == -1) {
-            log.error("파일명에 확장자가 없음: {}", fileName);
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
-        }
-
-        String extension = fileName.substring(lastDotIndex + 1).toLowerCase();
-        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
-
-        if (!allowedExtensions.contains(extension)) {
-            log.error("허용되지 않은 확장자: {}", extension);
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
-        }
-    }
-
-    // contentType 검증
-    private void validateContentType(String contentType) {
-        if (contentType == null || !contentType.startsWith("image/")) {
-            log.error("허용되지 않은 contentType: {}", contentType);
-            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
-        }
-    }
-
     private ImageUploadResult uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
         String contentType = image.getContentType();
@@ -130,6 +105,31 @@ public class S3ImageServiceImpl implements S3ImageService {
         } catch (IOException e) {
             log.error("이미지 파일 업로드 중 IOException 발생 - 파일명: {}, 예외: {}", originalFilename, e.getMessage(), e);
             throw e;
+        }
+    }
+
+    // 확장자 검증
+    private void validateImageFileExtension(String fileName) {
+        int lastDotIndex = fileName.lastIndexOf(".");
+        if (lastDotIndex == -1) {
+            log.error("파일명에 확장자가 없음: {}", fileName);
+            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
+        }
+
+        String extension = fileName.substring(lastDotIndex + 1).toLowerCase();
+        List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif", "webp");
+
+        if (!allowedExtensions.contains(extension)) {
+            log.error("허용되지 않은 확장자: {}", extension);
+            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
+        }
+    }
+
+    // contentType 검증
+    private void validateContentType(String contentType) {
+        if (contentType == null || !contentType.startsWith("image/")) {
+            log.error("허용되지 않은 contentType: {}", contentType);
+            throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
     }
 
