@@ -117,8 +117,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         MultipartFile image = requestDto.getImage();
 
-        String currentImageKey = user.getProfileImageKey();
-        s3ImageService.deleteImageFromS3(currentImageKey);
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
 
         ImageUploadResult imageUploadResult = s3ImageService.upload(image);
 
@@ -126,6 +125,20 @@ public class UserServiceImpl implements UserService {
         user.setProfileImageKey(imageUploadResult.getKey());
 
         return new UserResponseDto(user);
+    }
+
+    @Transactional
+    @Override
+    public void deleteUserProfileImage(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+
+        // 기본 이미지로 재설정
+        String defaultImageUrl = "https://api.dicebear.com/6.x/avataaars/png?seed=" + user.getNickname();
+        user.setProfileImageUrl(defaultImageUrl);
+        user.setProfileImageKey(null);
     }
 
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
