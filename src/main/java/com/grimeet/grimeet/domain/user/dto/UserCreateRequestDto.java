@@ -42,8 +42,6 @@ public class UserCreateRequestDto {
   private String phoneNumber;
 
   public User toEntity(UserCreateRequestDto userCreateRequestDto, String encryptedPassword) {
-    String profileUrl = "https://api.dicebear.com/9.x/notionists-neutral/svg?seed=" + userCreateRequestDto.getNickname();
-
     return User.builder()
             .name(userCreateRequestDto.getName())
             .email(userCreateRequestDto.getEmail())
