@@ -14,6 +14,7 @@ import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
+import com.grimeet.grimeet.domain.userLog.service.UserLogService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserDetailServiceImpl userDetailService;
   private final UserRepository userRepository;
+  private final UserLogService userLogService;
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override
@@ -42,6 +44,9 @@ public class AuthServiceImpl implements AuthService {
     User createdUser = userCreateRequestDto.toEntity(userCreateRequestDto, encryptedPassword);
 
     userRepository.save(createdUser);
+    // 회원가입 시 사용자 로그 생성
+    userLogService.createUserLog(createdUser.getEmail());
+
 
     return new UserResponseDto(createdUser);
   }
