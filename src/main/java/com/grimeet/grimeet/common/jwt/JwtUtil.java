@@ -3,6 +3,7 @@ package com.grimeet.grimeet.common.jwt;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -144,11 +145,15 @@ public class JwtUtil {
     return false;
   }
 
-  // Request Header에서 JWT Token 추출
+  // Cookie에서 JWT Token 추출
   public String resolveToken(HttpServletRequest request) {
-    String bearerToken = request.getHeader(header);
-    if(bearerToken != null && bearerToken.startsWith(tokenPrefix + " ")) {
-      return bearerToken.substring(tokenPrefix.length() + 1);
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("Authorization_Access".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
     }
     return null;
   }

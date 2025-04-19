@@ -16,18 +16,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      */
     Optional<User> findUserByEmail(String email); // Optional을 사용하면 null 체크를 하지 않아도 된다. NullPointException을 방지할 수 있다.
 
-
-    User findUserById(Long id);
-
     Optional<User> findById(Long id);
 
     Optional<UserResponseDto> findByEmail(String email);
 
-    Optional<User> findByNickname(String nickname);
-
     Boolean existsByEmail(String email);
 
-    Boolean existsByNickname(String nickname);
+    boolean existsByNickname(String nickname);
 
     Boolean existsByPhoneNumber(String phoneNumber);
+
 }
