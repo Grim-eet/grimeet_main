@@ -130,8 +130,8 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUserProfileImage(String email) {
-        User user = userRepository.findByEmail(email)
+    public void deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         s3ImageService.deleteImageFromS3(user.getProfileImageKey());
