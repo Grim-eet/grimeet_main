@@ -17,7 +17,10 @@ public interface UserService {
 
     // 휴면 회원으로 전환
     void updateUserStatusDormant(String email);
-  
+
+    // 스케줄러 -> 휴면 회원들로 전환
+    void updateUserStatusDormantBatch(List<Long> ids);
+
     // 일반 회원으로 전환
     void updateUserStatusNormal(String email);
 

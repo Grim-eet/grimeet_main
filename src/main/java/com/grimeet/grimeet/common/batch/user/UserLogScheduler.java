@@ -1,5 +1,8 @@
-package com.grimeet.grimeet.domain.userLog.scheduler;
+package com.grimeet.grimeet.common.batch.user;
 
+import com.grimeet.grimeet.domain.user.entity.User;
+import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.user.service.UserService;
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,26 +19,21 @@ import java.util.List;
 public class UserLogScheduler {
 
     private final UserLogRepository userLogRepository;
+    private final UserService userService;
 
     @Scheduled(cron = "0 0 0 * * *")
     public void updateUserLogByDormantCheck() {
         LocalDate now = LocalDate.now();
         List<UserLog> userLogs = userLogRepository.findByNextDormantCheckDateLessThanEqual(now);
-
-        if (userLogs.isEmpty()) {
-            log.info("[스케줄러] 휴면 검사 대상 없음 (기준일: {})", now);
-            return;
-        }
-
         log.info("[스케줄러] 휴면 검사 대상 {}명 발견", userLogs.size());
 
-        for (UserLog userLog : userLogs) {
-            userLog.updateNextDormantCheckDate(userLog.getNextDormantCheckDate().plusDays(365));
-            userLogRepository.save(userLog);
-        }
+        List<Long> userIds = userLogs.stream()
+                .map(UserLog::getUserId)
+                .toList();
 
-        userLogRepository.saveAll(userLogs);
-        log.info("[스케줄러] 휴면 검사 주기 갱신 완료");
+        userService.updateUserStatusDormantBatch(userIds);
+
+        log.info("[스케줄러] 휴면 전환 완료", userIds.size());
     }
 
 }

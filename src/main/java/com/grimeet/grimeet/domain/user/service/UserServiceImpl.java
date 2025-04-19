@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserStatusWithdrawal(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
@@ -56,11 +56,32 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.WITHDRAWAL);
     }
 
+    @Transactional
+    @Override
+    public void updateUserStatusDormantBatch(List<Long> ids) {
+        List<User> users = userRepository.findByIdIn(ids);  // 한번에 조회
+
+        List<Long> foundIds = users.stream()
+                .map(User::getId)
+                .toList();
+
+        List<Long> notFoundIds = ids.stream()
+                .filter(id -> !foundIds.contains(id))
+                .toList();
+
+        for (User user : users) {
+            user.setUserStatus(UserStatus.DORMANT);
+        }
+
+        log.info("[UserService] 휴면 처리 완료 → 총 {}, 실패 {}", users.size(), notFoundIds.size());
+
+    }
+
     // 유저 상태 휴면 전환
     @Transactional
     @Override
     public void updateUserStatusDormant(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
@@ -73,7 +94,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserStatusNormal(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
