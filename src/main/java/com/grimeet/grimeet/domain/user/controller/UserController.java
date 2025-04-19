@@ -94,4 +94,15 @@ public class UserController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "프로필 이미지 수정", description = "기존 이미지를 삭제하고 새 이미지를 등록합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 변경 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식 또는 이미지 파일"),
+            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
+    })
+    @DeleteMapping("/update/profile-image")
+    public ResponseEntity<UserResponseDto> deleteUserProfileImage(@Valid @ModelAttribute UserDeleteProfileImageRequestDto requestDto) {
+        UserResponseDto responseDto = userService.deleteUserProfileImage(requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
 }
