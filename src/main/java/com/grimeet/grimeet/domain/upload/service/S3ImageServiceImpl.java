@@ -113,14 +113,14 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         try (
                 InputStream inputStream = image.getInputStream();
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(IOUtils.toByteArray(inputStream))
         ) {
             ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType(contentType);
-            metadata.setContentLength(byteArrayInputStream.available());
+            metadata.setContentType(image.getContentType());
+            metadata.setContentLength(image.getSize());
 
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, byteArrayInputStream, metadata)
+            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, s3FileName, inputStream, metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead);
+
             amazonS3.putObject(putObjectRequest);
 
             String uploadedUrl = amazonS3.getUrl(bucketName, s3FileName).toString();
@@ -129,7 +129,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         } catch (IOException e) {
             log.error("이미지 파일 업로드 중 IOException 발생 - 파일명: {}, 예외: {}", originalFilename, e.getMessage(), e);
-            throw e; // 상위에서 다시 처리
+            throw e;
         }
     }
 
