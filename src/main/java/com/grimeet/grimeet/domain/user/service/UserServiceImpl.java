@@ -2,15 +2,14 @@ package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
+import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
-import com.grimeet.grimeet.domain.user.validation.PasswordFormat;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.info.JavaInfoContributor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -118,16 +117,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         MultipartFile image = requestDto.getImage();
 
-        String currentImageUrl = user.getProfileImageUrl();
+        String currentImageKey = user.getProfileImageKey();
+        s3ImageService.deleteImageFromS3(currentImageKey);
 
-        // 기존 이미지가 아니면 삭제
-        s3ImageService.deleteIfNotDefault(currentImageUrl);
+         ImageUploadResult imageUploadResult = s3ImageService.upload(image);
 
-        String uploadedUrl = s3ImageService.upload(image);
-        String uploadedKey = s3ImageService.extractKeyFromUrl(uploadedUrl);
-
-        user.setProfileImageUrl(uploadedUrl);
-        user.setProfileImageKey(uploadedKey);
+        user.setProfileImageUrl(imageUploadResult.getUrl());
+        user.setProfileImageKey(imageUploadResult.getKey());
 
         return new UserResponseDto(user);
     }

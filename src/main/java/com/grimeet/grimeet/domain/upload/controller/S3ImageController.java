@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.upload.controller;
 
+import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,8 +29,8 @@ public class S3ImageController {
     })
     @PostMapping("/profile-image")
     public ResponseEntity<String> uploadProfileImage(@RequestPart("image") MultipartFile image) {
-        String uploadedUrl = s3ImageService.upload(image);
-        return ResponseEntity.ok(uploadedUrl);
+        s3ImageService.upload(image);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "프로필 이미지 삭제",
@@ -41,12 +42,7 @@ public class S3ImageController {
     })
     @DeleteMapping("/profile-image")
     public ResponseEntity<Void> deleteProfileImage(@RequestParam("url") String imageUrl) {
-        if (!isDefaultProfileImage(imageUrl)) {
-            s3ImageService.deleteImageFromS3(imageUrl);
-            log.info("사용자 이미지 삭제 완료: {}", imageUrl);
-        } else {
-            log.info("기본 이미지 삭제 생략: {}", imageUrl);
-        }
+        s3ImageService.deleteImageFromS3(imageUrl);
         return ResponseEntity.ok().build();
     }
 

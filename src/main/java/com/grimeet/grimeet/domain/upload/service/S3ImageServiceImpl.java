@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
+import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +38,7 @@ public class S3ImageServiceImpl implements S3ImageService {
     private String bucketName;
 
     @Override
-    public String upload(MultipartFile image) {
+    public ImageUploadResult upload(MultipartFile image) {
         if (image.isEmpty() || Objects.isNull(image.getOriginalFilename())) {
             throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
@@ -52,6 +53,22 @@ public class S3ImageServiceImpl implements S3ImageService {
             throw new GrimeetException(ExceptionStatus.S3_UPLOAD_FAIL);
         }
 
+    }
+
+    @Override
+    public void deleteImageFromS3(String imageKey) {
+        if (imageKey.isBlank()) {
+            log.info("기본 프로필 이미지여서 삭제 생략 - URL: {}", imageKey);
+            return;
+        }
+
+        try {
+            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, imageKey));
+            log.info("이미지 삭제 완료 - key: {}", imageKey);
+        } catch (Exception e){
+            log.error("이미지 삭제 실패 - key: {}, 예외: {}", imageKey, e.getMessage(), e);
+            throw new GrimeetException(ExceptionStatus.S3_DELETE_FAIL);
+        }
     }
 
     // 확장자 검증
@@ -79,7 +96,7 @@ public class S3ImageServiceImpl implements S3ImageService {
         }
     }
 
-    private String uploadImageToS3(MultipartFile image) throws IOException {
+    private ImageUploadResult uploadImageToS3(MultipartFile image) throws IOException {
         String originalFilename = image.getOriginalFilename(); //원본 파일 명
         String contentType = image.getContentType();
         String extension = extractExtension(originalFilename);
@@ -108,7 +125,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
             String uploadedUrl = amazonS3.getUrl(bucketName, s3FileName).toString();
             log.info("이미지 업로드 완료 - URL: {}", uploadedUrl);
-            return uploadedUrl;
+            return new ImageUploadResult(uploadedUrl, extractKeyFromUrl(uploadedUrl));
 
         } catch (IOException e) {
             log.error("이미지 파일 업로드 중 IOException 발생 - 파일명: {}, 예외: {}", originalFilename, e.getMessage(), e);
@@ -125,32 +142,6 @@ public class S3ImageServiceImpl implements S3ImageService {
         return fileName.substring(lastDotIndex + 1).toLowerCase();
     }
 
-    @Override
-    public void deleteImageFromS3(String imageAddress) {
-        String key = extractKeyFromUrl(imageAddress);
-        try {
-            amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
-            log.info("이미지 삭제 완료 - key: {}", key);
-        } catch (Exception e){
-            log.error("이미지 삭제 실패 - key: {}, 예외: {}", key, e.getMessage(), e);
-            throw new GrimeetException(ExceptionStatus.S3_DELETE_FAIL);
-        }
-    }
-
-    @Override
-    public void deleteIfNotDefault(String imageUrl) {
-        if (imageUrl != null && !isCustomProfileImage(imageUrl)) {
-            deleteImageFromS3(imageUrl);
-        } else {
-            log.info("기본 프로필 이미지여서 삭제 생략: {}", imageUrl);
-        }
-    }
-
-    private boolean isCustomProfileImage(String imageUrl) {
-        return imageUrl != null && !imageUrl.startsWith("https://api.dicebear.com");
-    }
-
-    @Override
     public String extractKeyFromUrl(String imageUrl) {
         try {
             URL url = new URL(imageUrl);
