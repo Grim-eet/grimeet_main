@@ -30,10 +30,10 @@ public class UserServiceImpl implements UserService {
     // email로 유저 찾기
     @Transactional
     @Override
-    public User findUserByEmail(String email) {
+    public UserResponseDto findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
-        return user;
+        return new UserResponseDto(user);
     }
 
     // 전체 유저 조회
