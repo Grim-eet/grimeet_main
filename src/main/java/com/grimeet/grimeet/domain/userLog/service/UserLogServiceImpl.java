@@ -92,12 +92,22 @@ public class UserLogServiceImpl implements UserLogService {
    * 다음 비밀번호 변경 알림 예정일이 지난 사용자 로그 조회
    * @return List<UserLogResponseDto>
    */
+//  @Override
+//  public List<UserLogResponseDto> findAllUserLogsForNotification() {
+//    LocalDate now = LocalDate.now();
+//    return userLogRepository.findAllByNextNotificationDateEqual(now).stream()
+//            .map(UserLogResponseDto::new)
+//            .collect(Collectors.toList());
+//  }
+
+  /**
+   * 다음 비밀번호 변경 알림 예정일이 지났는지 확인
+   * @return
+   */
   @Override
-  public List<UserLogResponseDto> findAllUserLogsForNotification() {
+  public boolean checkUserLogsForNotification(Long userId) {
     LocalDate now = LocalDate.now();
-    return userLogRepository.findAllByNextNotificationDateEqual(now).stream()
-            .map(UserLogResponseDto::new)
-            .collect(Collectors.toList());
+    return userLogRepository.findNextNotificationDateEqual(userId, now) != null;
   }
 
   /**

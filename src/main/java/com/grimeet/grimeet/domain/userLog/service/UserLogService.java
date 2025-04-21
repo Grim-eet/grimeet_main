@@ -9,6 +9,7 @@ public interface UserLogService {
   UserLogResponseDto findUserLogByUserId(Long userId);
   UserLogResponseDto findUserLogById(Long id);
   UserLogResponseDto updateUserLogByLogin(String userEmail);
+  boolean checkUserLogsForNotification(Long Id);
   UserLogResponseDto updateUserLogByPassword(String userEmail);
   List<UserLogResponseDto> findAllUserLogsForDormantCheck();
   List<UserLogResponseDto> findAllUserLogsForNotification();
