@@ -1,8 +1,10 @@
 package com.grimeet.grimeet.common.batch.user;
 
+import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
+import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,30 +19,27 @@ import java.util.List;
 public class UserLogScheduler {
 
     private final UserLogRepository userLogRepository;
-    private final UserService userService;
+    private final UserLogFacade userLogFacade;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 0 3 * * *")    // 매일 오전 3시
     public void updateUserLogByDormantCheck() {
         try {
             LocalDate now = LocalDate.now();
-            List<UserLog> userLogs = userLogRepository.findByNextDormantCheckDateLessThanEqual(now);
+            List<UserLog> userLogs = userLogRepository.findCandidatesForDormantCheck(now, List.of(UserStatus.NORMAL, UserStatus.SOCIAL));
             log.info("[UserLogScheduler] 휴면 검사 대상 {}명 발견", userLogs.size());
 
-            if (userLogs.isEmpty()) {
-                return;
-            }
+            if (userLogs.isEmpty()) return;
 
             List<Long> userIds = userLogs.stream()
                     .map(UserLog::getUserId)
                     .toList();
 
-            userService.updateUserStatusDormantBatch(userIds);
+            userLogFacade.convertUsersToDormant(userIds); // 💡 이 부분만 바꾼 것
 
-            log.info("[UserLogScheduler] 휴면 전환 완료: 총 {}명 조회", userLogs.size());
+            log.info("[UserLogScheduler] 휴면 전환 완료: 총 {}명 처리", userIds.size());
         } catch (Exception e) {
-            log.info("[UserLogScheduler] 휴면 전환 중 예외 발생: {}", e.getMessage(), e);
+            log.error("[UserLogScheduler] 예외 발생: {}", e.getMessage(), e);
         }
-
     }
 
 }
