@@ -13,8 +13,7 @@ import java.util.List;
 public interface UserLogRepository extends JpaRepository<UserLog, Long> {
     UserLog findUserLogByUserId(Long userId);
 
-    @Query("SELECT u FROM UserLog u WHERE u.nextNotificationDate = :now")
-    List<UserLog> findAllByNextNotificationDateEqual(@Param("now") LocalDate now);
+    List<UserLog> findByNextDormantCheckDateLessThanEqual(LocalDate date);
 
     @Query("SELECT u FROM UserLog u WHERE u.userId = :userId AND u.nextNotificationDate <= :now")
     UserLog findNextNotificationDateAfter(@Param("userId") Long id, @Param("now") LocalDate now);
