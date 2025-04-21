@@ -1,7 +1,5 @@
 package com.grimeet.grimeet.common.batch.user;
 
-import com.grimeet.grimeet.domain.user.entity.User;
-import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;

@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.user.repository;
 
+import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
-    List<User> findByIdIn(List<Long> ids);
+    @Query("""
+        SELECT u FROM User u
+        WHERE u.id IN :ids
+        AND u.userStatus IN :statuses
+    """)
+    List<User> findByIdInAndUserStatusIn(@Param("ids")List<Long> ids, @Param("statuses")List<UserStatus> statuses);
 
     Boolean existsByEmail(String email);
 

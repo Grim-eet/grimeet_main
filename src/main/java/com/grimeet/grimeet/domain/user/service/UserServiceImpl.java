@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
     // 전체 유저 조회
     @Transactional
     @Override
-    public List<UserCreateRequestDto> findAllUsers() {
+    public List<User> findAllUsers() {
         return List.of();
     }
 
@@ -61,7 +60,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserStatusDormantBatch(List<Long> ids) {
         try {
-            List<User> users = userRepository.findByIdIn(ids);  // 한번에 조회
+            List<User> users = userRepository.findByIdInAndUserStatusIn(ids, List.of(UserStatus.NORMAL, UserStatus.SOCIAL));  // 한번에 조회
 
             // 일반, 소셜 회원만 조회 -> 휴면 전환
             int successCount = 0;
