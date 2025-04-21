@@ -8,6 +8,7 @@ import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.userLog.service.UserLogService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserLogService userLogService;
     private final S3ImageService s3ImageService;
 
     // email로 유저 찾기
@@ -138,6 +140,7 @@ public class UserServiceImpl implements UserService {
         verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
 
         user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        userLogService.updateUserLogByPassword(user.getEmail());
 
         return new UserResponseDto(user);
     }

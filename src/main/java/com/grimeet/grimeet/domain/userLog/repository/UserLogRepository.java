@@ -2,6 +2,8 @@ package com.grimeet.grimeet.domain.userLog.repository;
 
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -13,4 +15,6 @@ public interface UserLogRepository extends JpaRepository<UserLog, Long> {
 
     List<UserLog> findByNextDormantCheckDateLessThanEqual(LocalDate date);
 
+    @Query("SELECT u FROM UserLog u WHERE u.userId = :userId AND u.nextNotificationDate <= :now")
+    UserLog findNextNotificationDateAfter(@Param("userId") Long id, @Param("now") LocalDate now);
 }

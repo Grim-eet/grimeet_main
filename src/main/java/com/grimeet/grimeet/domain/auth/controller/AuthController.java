@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.auth.controller;
 
+import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
+import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.service.AuthService;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
@@ -15,10 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,24 +46,30 @@ public class AuthController {
           @ApiResponse(responseCode = "400", description = "잘못된 요청")
   })
   @PostMapping("/login")
-  public ResponseEntity<Void> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
-    String accessToken = authService.login(userLoginRequestDto);
+  public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
+    AuthResponseDto tokenDto = authService.login(userLoginRequestDto);
 
-    // 쿠키 생성 및 설정
-    Cookie cookie = new Cookie("Authorization_Access", accessToken);
+    Cookie cookie = new Cookie("Authorization_Access", tokenDto.getAccessToken());
     cookie.setHttpOnly(true);
-    cookie.setSecure(false);  // 배포 환경 시 true로 변경
-    cookie.setPath("/");  // 모든 경로에서 접근 가능하도록 설정
-    cookie.setMaxAge(cookieMaxAge);  // 24시간 동안 유효
+    cookie.setSecure(false); // 운영 환경에서는 반드시 true
+    cookie.setPath("/");
+    cookie.setMaxAge(cookieMaxAge);
     response.addCookie(cookie);
 
-    return ResponseEntity.status(HttpStatus.OK).build();
+    // AccessToken은 쿠키로 보내고, RefreshToken은 body로 응답
+    // 이유는 AccessToken은 클라이언트에서 자주 사용되므로 쿠키에 저장하고, RefreshToken은 서버에서 관리하기 위함
+    return ResponseEntity.ok(AuthResponseDto.builder()
+            .refreshToken(tokenDto.getRefreshToken())
+            .isPasswordChangeRequired(tokenDto.getIsPasswordChangeRequired())
+            .isDormant(tokenDto.getIsDormant())
+            .build());
   }
 
-  @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다.")
+  @Operation(summary = "로그아웃", description = "AccessToken 쿠키를 삭제하고 RefreshToken을 무효화합니다.")
   @ApiResponses({
           @ApiResponse(responseCode = "204", description = "로그아웃 성공"),
-          @ApiResponse(responseCode = "400", description = "잘못된 요청")
+          @ApiResponse(responseCode = "401", description = "인증 실패"),
+          @ApiResponse(responseCode = "500", description = "서버 내부 에러")
   })
   @PostMapping("/logout")
   public void logout() {}
@@ -72,4 +77,17 @@ public class AuthController {
 //    authService.logout(userEmail);
 //    return ResponseEntity.status(HttpStatus.NO_CONTENT).body("로그아웃 되었습니다.");
 //  }
+
+  @Operation(summary = "AccessToken 재발급", description = "RefreshToken을 이용하여 AccessToken을 재발급합니다.")
+  @ApiResponses({
+          @ApiResponse(responseCode = "200", description = "재발급 성공"),
+          @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰")
+  })
+  @PostMapping("/refresh")
+  public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
+          @RequestHeader("Authorization_Refresh") String refreshToken
+  ) {
+    TokenRefreshResponseDto response = authService.createAccessToken(refreshToken);
+    return ResponseEntity.ok(response);
+  }
 }

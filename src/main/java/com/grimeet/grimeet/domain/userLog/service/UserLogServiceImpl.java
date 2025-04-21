@@ -11,7 +11,6 @@ import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 
 @Slf4j
@@ -95,9 +94,26 @@ public class UserLogServiceImpl implements UserLogService {
     return userLogs.stream().map(UserLogResponseDto::new).toList();
   }
 
+  /**
+   * 다음 비밀번호 변경 알림 예정일이 지난 사용자 로그 조회
+   * @return List<UserLogResponseDto>
+   */
+//  @Override
+//  public List<UserLogResponseDto> findAllUserLogsForNotification() {
+//    LocalDate now = LocalDate.now();
+//    return userLogRepository.findAllByNextNotificationDateEqual(now).stream()
+//            .map(UserLogResponseDto::new)
+//            .collect(Collectors.toList());
+//  }
+
+  /**
+   * 다음 비밀번호 변경 알림 예정일이 지났는지 확인
+   * @return
+   */
   @Override
-  public List<UserLogResponseDto> findAllUserLogsForNotification() {
-    return List.of();
+  public boolean checkUserLogsForNotification(Long userId) {
+    LocalDate now = LocalDate.now();
+    return userLogRepository.findNextNotificationDateAfter(userId, now) != null;
   }
 
   /**

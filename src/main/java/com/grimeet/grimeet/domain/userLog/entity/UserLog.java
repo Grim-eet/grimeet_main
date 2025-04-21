@@ -24,22 +24,22 @@ public class UserLog extends BaseTime {
   @Column(name = "user_log_id")
   private Long id;
 
-  @Schema(description = "마지막 로그인 일시", example = "2024-10-01 00:00:00")
+  @Schema(description = "마지막 로그인 일시", example = "2024-10-01")
   @Comment("마지막 로그인 일시")
   @Column(name = "last_login_at", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate lastLoginAt;
 
-  @Schema(description = "최근 비밀번호 변경 일시", example = "2024-10-01 00:00:00")
+  @Schema(description = "최근 비밀번호 변경 일시", example = "2024-10-01")
   @Comment("최근 비밀번호 변경 일시")
   @Column(name = "changed_password_at", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate changedPasswordAt;
 
-  @Schema(description = "휴면 상태 전환 예정일", example = "2023-10-01 00:00:00")
+  @Schema(description = "휴면 상태 전환 예정일", example = "2023-10-01")
   @Comment("휴면 상태 전환 예정일")
   @Column(name = "next_dormant_check_date", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate nextDormantCheckDate;
 
-  @Schema(description = "다음 비밀번호 변경 알림 예정일", example = "2024-11-01 00:00:00")
+  @Schema(description = "다음 비밀번호 변경 알림 예정일", example = "2024-11-01")
   @Comment("다음 비밀번호 변경 알림 예정일")
   @Column(name = "next_notification_date", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate nextNotificationDate;

@@ -1,7 +1,6 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.domain.user.dto.*;
-import com.grimeet.grimeet.domain.user.entity.User;
 
 import java.util.List;
 
