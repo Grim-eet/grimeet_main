@@ -12,5 +12,5 @@ public interface UserLogService {
   boolean checkUserLogsForNotification(Long Id);
   UserLogResponseDto updateUserLogByPassword(String userEmail);
   List<UserLogResponseDto> findAllUserLogsForDormantCheck();
-  List<UserLogResponseDto> findAllUserLogsForNotification();
+//  List<UserLogResponseDto> findAllUserLogsForNotification();
 }
