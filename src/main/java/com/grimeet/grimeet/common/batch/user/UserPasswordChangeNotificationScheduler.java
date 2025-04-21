@@ -14,7 +14,7 @@ import java.util.List;
 @Slf4j
 public class UserPasswordChangeNotificationScheduler {
 
-  private final UserLogService userLogService;
+//  private final UserLogService userLogService;
 
   /**
    * 비밀번호 변경 알림 스케줄러(알림 기능 구현 후 활성화 예정)
