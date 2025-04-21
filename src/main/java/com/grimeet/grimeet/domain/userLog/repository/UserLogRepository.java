@@ -16,6 +16,6 @@ public interface UserLogRepository extends JpaRepository<UserLog, Long> {
     @Query("SELECT u FROM UserLog u WHERE u.nextNotificationDate = :now")
     List<UserLog> findAllByNextNotificationDateEqual(@Param("now") LocalDate now);
 
-    @Query("SELECT u FROM UserLog u WHERE u.userId = :userId AND u.nextNotificationDate = :now")
-    UserLog findNextNotificationDateEqual(@Param("userId") Long id, @Param("now") LocalDate now);
+    @Query("SELECT u FROM UserLog u WHERE u.userId = :userId AND u.nextNotificationDate <= :now")
+    UserLog findNextNotificationDateAfter(@Param("userId") Long id, @Param("now") LocalDate now);
 }

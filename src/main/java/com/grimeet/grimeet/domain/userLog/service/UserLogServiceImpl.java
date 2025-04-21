@@ -104,7 +104,7 @@ public class UserLogServiceImpl implements UserLogService {
   @Override
   public boolean checkUserLogsForNotification(Long userId) {
     LocalDate now = LocalDate.now();
-    return userLogRepository.findNextNotificationDateEqual(userId, now) != null;
+    return userLogRepository.findNextNotificationDateAfter(userId, now) != null;
   }
 
   /**
