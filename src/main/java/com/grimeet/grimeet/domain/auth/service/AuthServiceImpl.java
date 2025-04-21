@@ -11,11 +11,10 @@ import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
-import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
-import com.grimeet.grimeet.domain.userLog.service.UserLogService;
+import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserDetailServiceImpl userDetailService;
   private final UserRepository userRepository;
-  private final UserLogService userLogService;
+  private final UserLogFacade userLogFacade;
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override
@@ -46,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
 
     userRepository.save(createdUser);
     // 회원가입 시 사용자 로그 생성
-    userLogService.createUserLog(createdUser.getEmail());
+    userLogFacade.createUserLog(createdUser.getId());
 
 
     return new UserResponseDto(createdUser);
@@ -116,9 +115,9 @@ public class AuthServiceImpl implements AuthService {
     String savedRefreshToken = saveOrUpdateRefreshToken(findUser, refreshToken);
 
     // 비밀번호 변경 권장 알림 체크
-    boolean checkChangePasswordRequired = userLogService.checkUserLogsForNotification(findUser.getId());
+    boolean checkChangePasswordRequired = userLogFacade.checkNotificationRequired(findUser.getId());
     // 휴면 계정 여부 체크
-    boolean checkDormantAccount = false; // 추후 기능 구현 후 추가 예정
+    boolean checkDormantAccount = userLogFacade.checkDormantUserLog(findUser.getId());
 
     // accessToken 반환
     return AuthResponseDto.builder()
@@ -142,30 +141,6 @@ public class AuthServiceImpl implements AuthService {
               return createdToken.getToken();
             });
   }
-
-  // Spring Security에서 구현된 logout 메서드 사용
-//  @Override
-//  @Transactional
-//  public void logout(String userEmail) {
-//    RefreshToken findRefreshToken = verifyExistRefreshTokenByUsername(userEmail);
-//    String findUsername = jwtUtil.getUsernameFromRefreshToken(findRefreshToken.getToken());
-//    verifyExistUsername(findUsername);
-//
-//    findRefreshToken.updateToken("");
-//  }
-
-//  private void verifyExistUsername(String findUsername) {
-//    userRepository.findByEmail(findUsername).orElseThrow(() -> {
-//      throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-//    });
-//  }
-
-
-//  private RefreshToken verifyExistRefreshTokenByRefreshToken(String refreshToken) {
-//    return refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> {
-//      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
-//    });
-//  }
 
   private User verifyExistUserToUseUserDetail(UserDetails findUserDetail) {
     return userRepository.findByEmail(findUserDetail.getUsername()).orElseThrow(() -> {

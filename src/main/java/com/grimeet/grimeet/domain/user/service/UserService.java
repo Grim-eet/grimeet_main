@@ -9,9 +9,6 @@ public interface UserService {
     // email로 유저 찾기
     UserResponseDto findUserByEmail(String email);
 
-    // 전체 유저 조회
-    List<User> findAllUsers();
-
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
 
