@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -61,20 +62,17 @@ public class UserServiceImpl implements UserService {
     public void updateUserStatusDormantBatch(List<Long> ids) {
         List<User> users = userRepository.findByIdIn(ids);  // 한번에 조회
 
-        List<Long> foundIds = users.stream()
-                .map(User::getId)
-                .toList();
-
-        List<Long> notFoundIds = ids.stream()
-                .filter(id -> !foundIds.contains(id))
-                .toList();
+        // 일반, 소셜 회원만 조회 -> 휴면 전환
+        int successCount = 0;
 
         for (User user : users) {
-            user.setUserStatus(UserStatus.DORMANT);
+            if (user.getUserStatus() == UserStatus.NORMAL || user.getUserStatus() == UserStatus.SOCIAL) {
+                user.setUserStatus(UserStatus.DORMANT);
+                successCount++;
+            }
         }
 
-        log.info("[UserService] 휴면 처리 완료 → 총 {}, 실패 {}", users.size(), notFoundIds.size());
-
+        log.info("[UserService] 휴면 처리 완료 → 조회: 총 {}, 휴면 전환 성공: {}", users.size(), successCount);
     }
 
     // 유저 상태 휴면 전환
