@@ -23,17 +23,26 @@ public class UserLogScheduler {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void updateUserLogByDormantCheck() {
-        LocalDate now = LocalDate.now();
-        List<UserLog> userLogs = userLogRepository.findByNextDormantCheckDateLessThanEqual(now);
-        log.info("[스케줄러] 휴면 검사 대상 {}명 발견", userLogs.size());
+        try {
+            LocalDate now = LocalDate.now();
+            List<UserLog> userLogs = userLogRepository.findByNextDormantCheckDateLessThanEqual(now);
+            log.info("[UserLogScheduler] 휴면 검사 대상 {}명 발견", userLogs.size());
 
-        List<Long> userIds = userLogs.stream()
-                .map(UserLog::getUserId)
-                .toList();
+            if (userLogs.isEmpty()) {
+                return;
+            }
 
-        userService.updateUserStatusDormantBatch(userIds);
+            List<Long> userIds = userLogs.stream()
+                    .map(UserLog::getUserId)
+                    .toList();
 
-        log.info("[스케줄러] 휴면 전환 완료", userIds.size());
+            userService.updateUserStatusDormantBatch(userIds);
+
+            log.info("[UserLogScheduler] 휴면 전환 완료: 총 {}명 조회", userLogs.size());
+        } catch (Exception e) {
+            log.info("[UserLogScheduler] 휴면 전환 중 예외 발생: {}", e.getMessage(), e);
+        }
+
     }
 
 }
