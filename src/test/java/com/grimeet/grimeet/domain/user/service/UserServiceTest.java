@@ -4,6 +4,7 @@ import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +52,7 @@ class UserServiceTest {
                 .build());
     }
 
+    @DisplayName("정상_상태의_유저를_휴면으로_전환한다")
     @Test
     void 정상_상태의_유저를_휴면으로_전환한다() {
         List<Long> ids = List.of(user1.getId(), user2.getId());
@@ -63,6 +65,7 @@ class UserServiceTest {
         }
     }
 
+    @DisplayName("유저가_없는_경우에도_예외없이_동작한다")
     @Test
     void 유저가_없는_경우에도_예외없이_동작한다() {
         // given

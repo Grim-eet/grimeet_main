@@ -26,7 +26,7 @@ public class UserLog extends BaseTime {
 
   @Schema(description = "마지막 로그인 일시", example = "2024-10-01 00:00:00")
   @Comment("마지막 로그인 일시")
-  @Column(name = "last_login_at", nullable = false, updatable = true, columnDefinition = "DATETIME")
+  @Column(name = "last_login_at", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate lastLoginAt;
 
   @Schema(description = "최근 비밀번호 변경 일시", example = "2024-10-01 00:00:00")
@@ -36,7 +36,7 @@ public class UserLog extends BaseTime {
 
   @Schema(description = "휴면 상태 전환 예정일", example = "2023-10-01 00:00:00")
   @Comment("휴면 상태 전환 예정일")
-  @Column(name = "next_dormant_check_date", nullable = false, updatable = true, columnDefinition = "DATET")
+  @Column(name = "next_dormant_check_date", nullable = false, updatable = true, columnDefinition = "DATE")
   private LocalDate nextDormantCheckDate;
 
   @Schema(description = "다음 비밀번호 변경 알림 예정일", example = "2024-11-01 00:00:00")
