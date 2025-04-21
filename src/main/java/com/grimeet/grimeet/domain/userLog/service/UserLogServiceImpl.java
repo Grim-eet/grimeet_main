@@ -1,13 +1,10 @@
 package com.grimeet.grimeet.domain.userLog.service;
 
-import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
-import com.grimeet.grimeet.domain.user.service.UserService;
 import com.grimeet.grimeet.domain.userLog.dto.UserLogResponseDto;
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
 import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,67 +16,56 @@ import java.util.List;
 public class UserLogServiceImpl implements UserLogService {
 
   private final UserLogRepository userLogRepository;
-  private final UserService userService;
 
   /**
    * 사용자 로그 생성(회원가입 시 자동 생성)
-   * @param userEmail
+   * @param userId
    * @return UserLogResponseDto
    */
   @Override
-  public UserLogResponseDto createUserLog(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
+  public UserLogResponseDto createUserLog(Long userId) {
     LocalDate now = LocalDate.now();
     UserLog userLog = UserLog.builder()
+            .userId(userId)
             .lastLoginAt(now)
             .changedPasswordAt(now)
-            .nextDormantCheckDate(updateNextDormantCheckDate(now))
-            .nextNotificationDate(updateNextNotificationDate(now))
-            .userId(findUserResponseDto.getId())
+            .nextDormantCheckDate(now.plusDays(365))
+            .nextNotificationDate(now.plusDays(90))
             .build();
-    UserLog savedUserLog = userLogRepository.save(userLog);
-    return new UserLogResponseDto(savedUserLog);
+    return new UserLogResponseDto(userLogRepository.save(userLog));
   }
-
+  /**
+   * 로그인 시 사용자 로그 업데이트
+   * @param userId
+   * @return UserLogResponseDto
+   */
   @Override
-  public UserLogResponseDto findUserLogByUserId(Long userId) {
-    return null;
-  }
-
-  @Override
-  public UserLogResponseDto findUserLogById(Long id) {
-    return null;
+  public UserLogResponseDto updateUserLogByLogin(Long userId) {
+    UserLog userLog = userLogRepository.findUserLogByUserId(userId);
+    LocalDate now = LocalDate.now();
+    userLog.updateLastLoginAt(now);
+    userLog.updateNextDormantCheckDate(now.plusDays(365));
+    return new UserLogResponseDto(userLogRepository.save(userLog));
   }
 
   /**
-   * 로그인 시 사용자 로그 업데이트
-   * @param userEmail
-   * @return
+   * 비밀번호 변경 시 사용자 로그 업데이트
+   * @param userId
+   * @return UserLogResponseDto
    */
   @Override
-  public UserLogResponseDto updateUserLogByLogin(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
-    UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
-
-    LocalDate now = LocalDate.now();
-    userLog.updateLastLoginAt(now);
-    userLog.updateNextDormantCheckDate(updateNextDormantCheckDate(now));
-    UserLog updatedUserLog = userLogRepository.save(userLog);
-    return new UserLogResponseDto(updatedUserLog);
-  }
-
-  @Override
-  public UserLogResponseDto updateUserLogByPassword(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByEmail(userEmail);
-    UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
-
+  public UserLogResponseDto updateUserLogByPassword(Long userId) {
+    UserLog userLog = userLogRepository.findUserLogByUserId(userId);
     LocalDate now = LocalDate.now();
     userLog.updateChangedPasswordAt(now);
-    userLog.updateNextNotificationDate(updateNextNotificationDate(now));
-    UserLog updatedUserLog = userLogRepository.save(userLog);
-    return new UserLogResponseDto(updatedUserLog);
+    userLog.updateNextNotificationDate(now.plusDays(90));
+    return new UserLogResponseDto(userLogRepository.save(userLog));
   }
 
+  /**
+   * 휴면 사용자 조회
+   * @return List<UserLogResponseDto>
+   */
   @Override
   public List<UserLogResponseDto> findAllUserLogsForDormantCheck() {
     LocalDate now = LocalDate.now();
@@ -95,55 +81,35 @@ public class UserLogServiceImpl implements UserLogService {
   }
 
   /**
-   * 다음 비밀번호 변경 알림 예정일이 지난 사용자 로그 조회
-   * @return List<UserLogResponseDto>
-   */
-//  @Override
-//  public List<UserLogResponseDto> findAllUserLogsForNotification() {
-//    LocalDate now = LocalDate.now();
-//    return userLogRepository.findAllByNextNotificationDateEqual(now).stream()
-//            .map(UserLogResponseDto::new)
-//            .collect(Collectors.toList());
-//  }
-
-  /**
    * 다음 비밀번호 변경 알림 예정일이 지났는지 확인
-   * @return
+   * @return boolean
    */
   @Override
   public boolean checkUserLogsForNotification(Long userId) {
+    return userLogRepository.findNextNotificationDateAfter(userId, LocalDate.now()) != null;
+  }
+
+  @Override
+  public boolean checkUserLogsForDormant(Long Id) {
+    UserLog userLog = userLogRepository.findUserLogByUserId(Id);
+    if (userLog == null) {
+      return false;
+    }
     LocalDate now = LocalDate.now();
-    return userLogRepository.findNextNotificationDateAfter(userId, now) != null;
+    LocalDate nextDormantCheckDate = userLog.getNextDormantCheckDate();
+    if (nextDormantCheckDate != null && nextDormantCheckDate.isBefore(now)) {
+      return true;  // 휴면 전환 가능
+    }
+    log.info("[UserLogService] 휴면 전환 불가: 다음 체크일자: {}, 현재일자: {}", nextDormantCheckDate, now);
+    return false;
   }
 
   /**
-   * 일자 추가
-   * @param date
-   * @param days
-   * @return Date
+   * 휴면 사용자로의 전환
+   * @param userIds
    */
-  private LocalDate addDays(LocalDate date, int days) {
-    // LocalDate에 일자 추가
-    LocalDate result = date.plusDays(days);
-    // LocalDate -> Date
-    return result;
-  }
-
-  /**
-   * 다음 휴면 상태 전환 예정일 업데이트
-   * @param date
-   * @return Date
-   */
-  private LocalDate updateNextDormantCheckDate(LocalDate date) {
-    return addDays(date, 365);
-  }
-
-  /**
-   * 다음 비밀번호 변경 알림 예정일 업데이트
-   * @param date
-   * @return Date
-   */
-  private LocalDate updateNextNotificationDate(LocalDate date) {
-    return addDays(date, 90);
+  @Override
+  public void convertUsersToDormant(List<Long> userIds) {
+    log.info("[UserLogService] 휴면 전환된 사용자 ID: {}", userIds);
   }
 }
