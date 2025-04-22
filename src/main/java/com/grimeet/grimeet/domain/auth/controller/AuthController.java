@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.auth.controller;
 
+import com.grimeet.grimeet.domain.auth.dto.AuthLoginResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
@@ -46,7 +47,7 @@ public class AuthController {
           @ApiResponse(responseCode = "400", description = "잘못된 요청")
   })
   @PostMapping("/login")
-  public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
+  public ResponseEntity<AuthLoginResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
     AuthResponseDto tokenDto = authService.login(userLoginRequestDto);
 
     Cookie cookie = new Cookie("Authorization_Access", tokenDto.getAccessToken());
@@ -58,7 +59,7 @@ public class AuthController {
 
     // AccessToken은 쿠키로 보내고, RefreshToken은 body로 응답
     // 이유는 AccessToken은 클라이언트에서 자주 사용되므로 쿠키에 저장하고, RefreshToken은 서버에서 관리하기 위함
-    return ResponseEntity.ok(AuthResponseDto.builder()
+    return ResponseEntity.ok(AuthLoginResponseDto.builder()
             .refreshToken(tokenDto.getRefreshToken())
             .isPasswordChangeRequired(tokenDto.getIsPasswordChangeRequired())
             .isDormant(tokenDto.getIsDormant())
