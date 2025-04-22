@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "REFRESH_TOKENS")
+@Table(name = "refresh_tokens")
 @EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class RefreshToken extends BaseTime {
 

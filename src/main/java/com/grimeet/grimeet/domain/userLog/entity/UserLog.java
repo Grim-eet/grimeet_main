@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "USER_LOGS")
+@Table(name = "user_logs")
 @Getter
 @Builder
 @NoArgsConstructor
