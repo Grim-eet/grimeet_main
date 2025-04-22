@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.domain.userLog.service;
 
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import com.grimeet.grimeet.domain.userLog.dto.UserLogResponseDto;
 import com.grimeet.grimeet.domain.userLog.entity.UserLog;
@@ -28,14 +29,14 @@ public class UserLogServiceImpl implements UserLogService {
    */
   @Override
   public UserLogResponseDto createUserLog(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
+    User user = userService.findUserByEmail(userEmail);
     LocalDate now = LocalDate.now();
     UserLog userLog = UserLog.builder()
             .lastLoginAt(now)
             .changedPasswordAt(now)
             .nextDormantCheckDate(updateNextDormantCheckDate(now))
             .nextNotificationDate(updateNextNotificationDate(now))
-            .userId(findUserResponseDto.getId())
+            .userId(user.getId())
             .build();
     UserLog savedUserLog = userLogRepository.save(userLog);
     return new UserLogResponseDto(savedUserLog);
@@ -58,8 +59,8 @@ public class UserLogServiceImpl implements UserLogService {
    */
   @Override
   public UserLogResponseDto updateUserLogByLogin(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
-    UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
+    User user = userService.findUserByEmail(userEmail);
+    UserLog userLog = userLogRepository.findUserLogByUserId(user.getId());
 
     LocalDate now = LocalDate.now();
     userLog.updateLastLoginAt(now);
@@ -70,8 +71,8 @@ public class UserLogServiceImpl implements UserLogService {
 
   @Override
   public UserLogResponseDto updateUserLogByPassword(String userEmail) {
-    UserResponseDto findUserResponseDto = userService.findUserByUserEmail(userEmail);
-    UserLog userLog = userLogRepository.findUserLogByUserId(findUserResponseDto.getId());
+    User user = userService.findUserByEmail(userEmail);
+    UserLog userLog = userLogRepository.findUserLogByUserId(user.getId());
 
     LocalDate now = LocalDate.now();
     userLog.updateChangedPasswordAt(now);
