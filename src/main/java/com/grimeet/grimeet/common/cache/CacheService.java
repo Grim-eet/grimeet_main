@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.auth.service;
+package com.grimeet.grimeet.common.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class RedisService {
+public class CacheService {
 
-    private final StringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate; // Redis 클라이언트
 
     // Redis에 값 저장, 유효시간 설정
     public void setCode(String key, String value, long expireTime) {
