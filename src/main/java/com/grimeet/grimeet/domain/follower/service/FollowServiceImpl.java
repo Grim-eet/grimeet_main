@@ -3,7 +3,7 @@ package com.grimeet.grimeet.domain.follower.service;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.follower.entity.Follower;
-import com.grimeet.grimeet.domain.follower.repository.FollowerRepository;
+import com.grimeet.grimeet.domain.follower.repository.FollowRepository;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FollowerServiceImpl implements FollowerService {
+public class FollowServiceImpl implements FollowService {
 
-  private final FollowerRepository followerRepository;
+  private final FollowRepository followerRepository;
   private final UserRepository userRepository;
 
   @Override
@@ -41,11 +41,6 @@ public class FollowerServiceImpl implements FollowerService {
             .build();
 
     followerRepository.save(newFollow);
-  }
-
-  @Override
-  public void unfollow(Long followerId, Long followingId) {
-    followerRepository.deleteByFollowerIdAndFollowingId(followerId, followingId);
   }
 
   @Override
