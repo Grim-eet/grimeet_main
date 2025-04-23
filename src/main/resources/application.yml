@@ -36,8 +36,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${GRIM_TEST_USER}
-    password: ${GRIM_TEST_PASSWORD}
+    username: ${GRIM_TEST_EMAIL_USER}
+    password: ${GRIM_TEST_EMAIL_PASSWORD}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
