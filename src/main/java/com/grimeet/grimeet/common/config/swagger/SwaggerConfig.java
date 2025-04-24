@@ -25,8 +25,11 @@ public class SwaggerConfig {
                             .name("Grimeet")
                             .email("jgoneit@gmail.com")
                     )
-            ).servers(List.of(new Server().url("http://localhost:8081").description("Local Server"),
-                    new Server().url("https://api.grimeet.com").description("Production Server"))
+            ).servers(List.of(
+                    new Server().url("https://growing-choice-kingfish.ngrok-free.app/api").description("Ngrok Server"),
+                    new Server().url("http://localhost:8081/api").description("Local Server"),
+                    new Server().url("https://api.grimeet.com/api").description("Production Server")
+                    )
             ).components(new Components().addSecuritySchemes("bearer-jwt",
                     new SecurityScheme().type(SecurityScheme.Type.HTTP)
                             .scheme("bearer")
