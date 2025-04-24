@@ -1,9 +1,9 @@
-package com.grimeet.grimeet.domain.auth.service;
+package com.grimeet.grimeet.common.mail.service;
 
 import com.grimeet.grimeet.common.cache.service.CacheService;
-import com.grimeet.grimeet.common.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -11,17 +11,18 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AuthVerificationServiceImpl implements AuthVerificationService {
+public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final MailService mailService;
     private final CacheService cacheService;
 
-    private static final long TTL_SECONDS = 900; // 15분
+    @Value("${spring.mail.verification.auth-code-ttl}")
+    private long authCodeTtl; // 15분
 
     @Override
     public void sendVerificationCode(String email) {
         String code = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
-        cacheService.setAuthCode(email, code, TTL_SECONDS);
+        cacheService.setAuthCode(email, code, authCodeTtl);
         mailService.sendEmail(email, "[Grimeet] 인증 코드", "인증 코드: " + code); // 이메일 내용, 수정확인
     }
 

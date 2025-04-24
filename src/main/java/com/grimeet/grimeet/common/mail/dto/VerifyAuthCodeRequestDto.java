@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.auth.dto;
+package com.grimeet.grimeet.common.mail.dto;
 
 import com.grimeet.grimeet.domain.user.validation.Email;
 import jakarta.validation.constraints.NotBlank;

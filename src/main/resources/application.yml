@@ -41,6 +41,8 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+    verification:
+      auth-code-ttl: 900
 
 cloud:
   aws:

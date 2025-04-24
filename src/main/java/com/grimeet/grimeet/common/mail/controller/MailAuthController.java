@@ -1,8 +1,8 @@
-package com.grimeet.grimeet.domain.auth.controller;
+package com.grimeet.grimeet.common.mail.controller;
 
-import com.grimeet.grimeet.domain.auth.dto.SendAuthCodeRequestDto;
-import com.grimeet.grimeet.domain.auth.dto.VerifyAuthCodeRequestDto;
-import com.grimeet.grimeet.domain.auth.service.AuthVerificationService;
+import com.grimeet.grimeet.common.mail.dto.SendAuthCodeRequestDto;
+import com.grimeet.grimeet.common.mail.dto.VerifyAuthCodeRequestDto;
+import com.grimeet.grimeet.common.mail.service.EmailVerificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 public class MailAuthController {
 
-    private final AuthVerificationService authVerificationService;
+    private final EmailVerificationService authVerificationService;
 
     @PostMapping("/email-code")
     public ResponseEntity<String> sendVerificationCode(@Valid @RequestBody SendAuthCodeRequestDto requestDto) {
