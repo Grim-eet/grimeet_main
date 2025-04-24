@@ -5,10 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class SendAuthCodeRequestDto {
+public class VerifyAuthCodeRequestDto {
 
     @Email
     @NotBlank
     private String email;
+
+    @NotBlank
+    private String code;
 
 }
