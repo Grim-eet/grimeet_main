@@ -16,7 +16,7 @@ public class AuthVerificationServiceImpl implements AuthVerificationService {
     private final MailService mailService;
     private final CacheService cacheService;
 
-    private static final long TTL_SECONDS = 300; // 5분
+    private static final long TTL_SECONDS = 900; // 15분
 
     @Override
     public void sendVerificationCode(String email) {
