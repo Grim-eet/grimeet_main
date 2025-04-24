@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -52,7 +51,7 @@ public class AuthController {
 
     Cookie cookie = new Cookie("Authorization_Access", tokenDto.getAccessToken());
     cookie.setHttpOnly(true);
-    cookie.setSecure(false); // 운영 환경에서는 반드시 true
+    cookie.setSecure(true);
     cookie.setPath("/");
     cookie.setMaxAge(cookieMaxAge);
     response.addCookie(cookie);
