@@ -9,7 +9,7 @@ import lombok.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "users")
 @Getter
 @Builder
 @NoArgsConstructor

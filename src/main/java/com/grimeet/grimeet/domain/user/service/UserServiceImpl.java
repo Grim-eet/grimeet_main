@@ -8,6 +8,7 @@ import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,29 +26,23 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserLogFacade userLogFacade;
     private final S3ImageService s3ImageService;
 
     // email로 유저 찾기
     @Transactional
     @Override
-    public User findUserByEmail(String email) {
+    public UserResponseDto findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
-        return user;
-    }
-
-    // 전체 유저 조회
-    @Transactional
-    @Override
-    public List<UserCreateRequestDto> findAllUsers() {
-        return List.of();
+        return new UserResponseDto(user);
     }
 
     // 유저 상태 탈퇴 전환
     @Transactional
     @Override
     public void updateUserStatusWithdrawal(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
@@ -56,11 +51,35 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.WITHDRAWAL);
     }
 
+    @Transactional
+    @Override
+    public void updateUserStatusDormantBatch(List<Long> ids) {
+        try {
+            List<User> users = userRepository.findByIdInAndUserStatusIn(ids, List.of(UserStatus.NORMAL, UserStatus.SOCIAL));  // 한번에 조회
+
+            // 일반, 소셜 회원만 조회 -> 휴면 전환
+            int successCount = 0;
+
+            for (User user : users) {
+                if (user.getUserStatus() == UserStatus.NORMAL || user.getUserStatus() == UserStatus.SOCIAL) {
+                    user.setUserStatus(UserStatus.DORMANT);
+                    successCount++;
+                }
+            }
+
+            log.info("[UserService] 휴면 처리 완료 → 조회: 총 {}, 휴면 전환 성공: {}", users.size(), successCount);
+        } catch (Exception e) {
+            log.info("[UserService] 휴면 상태 일괄 전환 중 예외 발생: {}", e.getMessage());
+            // 알림이나 감지 필요 시 추가
+        }
+
+    }
+
     // 유저 상태 휴면 전환
     @Transactional
     @Override
     public void updateUserStatusDormant(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
@@ -73,7 +92,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserStatusNormal(String email) {
-        Optional<User> optionalUser = userRepository.findUserByEmail(email);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if (optionalUser.isEmpty()) {
             throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
@@ -114,6 +133,7 @@ public class UserServiceImpl implements UserService {
         verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
 
         user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        userLogFacade.updatePasswordLog(user.getId());
 
         return new UserResponseDto(user);
     }

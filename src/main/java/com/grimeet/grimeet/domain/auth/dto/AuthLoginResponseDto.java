@@ -9,15 +9,13 @@ import lombok.Getter;
  * 로그인 요청 응답 DTO
  *
  * @author : Jgone2
- * @since : 2025-04-21
+ * @since : 2025-04-22
  */
-@Schema(description = "로그인 요청 응답 - Service layer")
+@Schema(description = "로그인 요청 응답 - controller layer")
 @Builder
 @Getter
 @AllArgsConstructor
-public class AuthResponseDto {
-  @Schema(description = "액세스 토큰", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkb3BhbFByaW5jZXNzOTlAZ21haWwuY29tIiwiaWF0IjoxNjM0NzQwNjYwLCJleHAiOjE2MzQ3NDQyNjB9.7")
-  private String accessToken;
+public class AuthLoginResponseDto {
   @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkb3BhbFByaW5jZXNzOTlAZ21haWwuY29tIiwiaWF0IjoxNjM0NzQwNjYwLCJleHAiOjE2MzQ3NDQyNjB917")
   private String refreshToken;
   @Schema(description = "비밀번호 변경 필요 여부, true: 필요, false: 불필요", example = "false")

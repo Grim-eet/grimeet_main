@@ -26,6 +26,7 @@ public class SecurityConfig {
   private final CorsConfig corsConfig;
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtUtil jwtUtil;
+  public static final String ACCESS_TOKEN_COOKIE_NAME = "Authorization_Access";
 
   /**
    * AuthenticationManager 빈 등록
@@ -99,9 +100,12 @@ public class SecurityConfig {
   }
 
   private static void removeCookie(HttpServletResponse response) {
-    Cookie cookie = new Cookie("Authorization_Access", null);
+    Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, null);
     cookie.setMaxAge(0);
     cookie.setPath("/");
+    cookie.setHttpOnly(true);
+    cookie.setSecure(false);
+//    cookie.setDomain("grimeet.com");
     response.addCookie(cookie);
   }
 }

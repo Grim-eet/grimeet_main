@@ -1,24 +1,23 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.domain.user.dto.*;
-import com.grimeet.grimeet.domain.user.entity.User;
 
 import java.util.List;
 
 public interface UserService {
 
     // email로 유저 찾기
-    User findUserByEmail(String email);
-
-    // 전체 유저 조회
-    List<UserCreateRequestDto> findAllUsers();
+    UserResponseDto findUserByEmail(String email);
 
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
 
     // 휴면 회원으로 전환
     void updateUserStatusDormant(String email);
-  
+
+    // 스케줄러 -> 휴면 회원들로 전환
+    void updateUserStatusDormantBatch(List<Long> ids);
+
     // 일반 회원으로 전환
     void updateUserStatusNormal(String email);
 
