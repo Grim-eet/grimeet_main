@@ -13,5 +13,12 @@ services:
       MYSQL_PASSWORD: ${GRIM_MYSQL_PASSWORD}
       MYSQL_ROOT_HOST: "%"
       DEFAULT_AUTHENTICATION_PLUGIN: caching_sha2_password
+    networks:
+      - app-network
+
 volumes:
   mysql-data:
+
+networks:
+  app-network:
+    external: true
