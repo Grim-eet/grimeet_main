@@ -30,9 +30,9 @@ public class AuthVerificationServiceImpl implements AuthVerificationService {
         String cachedCode = cacheService.getAuthCode(email);
         boolean matched = code.equals(cachedCode);
         if (matched) {
-            log.info("[인증 성공] email={}, code={}", email, code);
+            log.info("[AuthVerificationService] 인증 성공: email={}, code={}", email, code);
         } else {
-            log.warn("[인증 실패] email={}, inputCode={}, savedCode={}", email, code, cachedCode);
+            log.warn("[AuthVerificationService] 인증 실패: email={}, inputCode={}, savedCode={}", email, code, cachedCode);
         }
         return matched;
     }
