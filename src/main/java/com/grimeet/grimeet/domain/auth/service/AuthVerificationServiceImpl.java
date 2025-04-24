@@ -25,6 +25,7 @@ public class AuthVerificationServiceImpl implements AuthVerificationService {
 
     @Override
     public boolean verifyCode(String email, String code) {
-        return false;
+        String cacheCode = cacheService.getCode(email);
+        return code.equals(cacheCode);
     }
 }
