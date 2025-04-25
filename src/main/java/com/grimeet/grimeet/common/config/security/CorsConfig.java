@@ -24,7 +24,7 @@ public class CorsConfig {
 
     corsConfiguration.setAllowCredentials(true);
 
-    corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "https://*.grimeet.com"));
+    corsConfiguration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "https://*.grimeet.com", "https://growing-choice-kingfish.ngrok-free.app"));
 
     corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     corsConfiguration.addExposedHeader("Authorization");

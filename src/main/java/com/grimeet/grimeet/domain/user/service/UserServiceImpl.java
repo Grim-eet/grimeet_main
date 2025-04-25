@@ -1,12 +1,20 @@
 package com.grimeet.grimeet.domain.user.service;
 
-import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
-import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
+import com.grimeet.grimeet.common.image.ProfileImageUtils;
+import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
+import com.grimeet.grimeet.domain.upload.service.S3ImageService;
+import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,72 +25,169 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserLogFacade userLogFacade;
+    private final S3ImageService s3ImageService;
 
+    // email로 유저 찾기
+    @Transactional
     @Override
-    public UserResponseDto createUser(UserCreateRequestDto createRequestDto) {
-        log.info("User Create Request : {}", createRequestDto);
-
-        verifyExistsEmail(createRequestDto.getEmail());
-        verifyExistsNickname(createRequestDto.getNickname());
-        verifyExistsPhoneNumber(createRequestDto.getPhoneNumber());
-
-        User createUser = createRequestDto.toEntity(createRequestDto);
-
-        User savedUser = userRepository.save(createUser);
-
-        return new UserResponseDto(savedUser);
+    public UserResponseDto findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+        return new UserResponseDto(user);
     }
 
+    // 유저 상태 탈퇴 전환
+    @Transactional
     @Override
-    public Optional<UserCreateRequestDto> findUserByUserId(Long userId) {
-        return Optional.empty();
+    public void updateUserStatusWithdrawal(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.WITHDRAWAL);
     }
 
+    @Transactional
     @Override
-    public Optional<UserCreateRequestDto> findUserByEmail(String email) {
-        return Optional.empty();
-    }
+    public void updateUserStatusDormantBatch(List<Long> ids) {
+        try {
+            List<User> users = userRepository.findByIdInAndUserStatusIn(ids, List.of(UserStatus.NORMAL, UserStatus.SOCIAL));  // 한번에 조회
 
-    @Override
-    public Optional<UserCreateRequestDto> fineUserByNickname(String nickname) {
-        return Optional.empty();
-    }
+            // 일반, 소셜 회원만 조회 -> 휴면 전환
+            int successCount = 0;
 
-    @Override
-    public List<UserCreateRequestDto> findAllUsers() {
-        return List.of();
-    }
+            for (User user : users) {
+                if (user.getUserStatus() == UserStatus.NORMAL || user.getUserStatus() == UserStatus.SOCIAL) {
+                    user.setUserStatus(UserStatus.DORMANT);
+                    successCount++;
+                }
+            }
 
-    @Override
-    public void updateDormantUser(Long userId) {
-
-    }
-
-    @Override
-    public void updateWithdrawUser(Long userId) {
-
-    }
-
-    @Override
-    public void deleteUser(Long userId) {
+            log.info("[UserService] 휴면 처리 완료 → 조회: 총 {}, 휴면 전환 성공: {}", users.size(), successCount);
+        } catch (Exception e) {
+            log.info("[UserService] 휴면 상태 일괄 전환 중 예외 발생: {}", e.getMessage());
+            // 알림이나 감지 필요 시 추가
+        }
 
     }
 
-    private void verifyExistsEmail(String email) {
-        if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+    // 유저 상태 휴면 전환
+    @Transactional
+    @Override
+    public void updateUserStatusDormant(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.DORMANT);
+    }
+
+    // 유저 상태 일반 전환
+    @Transactional
+    @Override
+    public void updateUserStatusNormal(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+
+        if (optionalUser.isEmpty()) {
+            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+        }
+        User user = optionalUser.get();
+        user.setUserStatus(UserStatus.NORMAL);
+    }
+      
+    // 유저 정보 업데이트
+    @Transactional
+    @Override
+    public UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        // 닉네임 변경
+        if (requestDto.getNickname() != null) {
+            verifyUniqueNickname(requestDto.getNickname());
+            user.setNickname(requestDto.getNickname());
+        }
+
+        // 전화번호 변경
+        if (requestDto.getPhoneNumber() != null) {
+            verifyUniquePhoneNumber(requestDto.getPhoneNumber());
+            user.setPhoneNumber(requestDto.getPhoneNumber());
+        }
+
+        return new UserResponseDto(user);
+    }
+
+    // 유저 비밀번호 업데이트
+    @Transactional
+    @Override
+    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
+
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        userLogFacade.updatePasswordLog(user.getId());
+
+        return new UserResponseDto(user);
+    }
+
+    // 유저 프로필 이미지 변경
+    @Transactional
+    @Override
+    public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+        MultipartFile image = requestDto.getImage();
+
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+
+        ImageUploadResult imageUploadResult = s3ImageService.upload(image);
+
+        user.setProfileImageUrl(imageUploadResult.getUrl());
+        user.setProfileImageKey(imageUploadResult.getKey());
+
+        return new UserResponseDto(user);
+    }
+
+    // 유저 프로필 이미지 삭제
+    @Transactional
+    @Override
+    public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+
+        // 기본 이미지로 재설정
+        user.setProfileImageUrl(ProfileImageUtils.generateProfileImageUrl(user.getNickname()));
+        user.setProfileImageKey(null);
+
+        return new UserResponseDto(user);
+    }
+
+    private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
+        if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+            throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
         }
     }
 
-    private void verifyExistsNickname(String nickname) {
+    private void verifyUniqueNickname(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
-            throw new IllegalArgumentException("이미 존재하는 닉네임입니다.");
+            throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
         }
     }
 
-    private void verifyExistsPhoneNumber(String phoneNumber) {
-        if (userRepository.existsByNickname(phoneNumber)) {
-            throw new IllegalArgumentException("이미 존재하는 전화번호입니다.");
+    private void verifyUniquePhoneNumber(String phoneNumber) {
+        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+            throw new GrimeetException(ExceptionStatus.PHONE_NUMBER_ALREADY_EXISTS);
         }
     }
+
 }

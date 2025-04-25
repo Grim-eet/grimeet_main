@@ -9,7 +9,7 @@ import lombok.*;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "users")
 @Getter
 @Builder
 @NoArgsConstructor
@@ -22,7 +22,7 @@ public class User extends BaseTime {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "user_name", length = 20, nullable = false, unique = false, updatable = true)
+    @Column(name = "user_name", length = 20, nullable = false, unique = false, updatable = false)
     private String name;
 
     @Column(name = "user_email", length = 255, nullable = false, unique = true, updatable = false)
@@ -34,10 +34,10 @@ public class User extends BaseTime {
     @Column(name = "user_nickname", length = 20, nullable = false, unique = true, updatable = true)
     private String nickname;
 
-    @Column(name = "user_phone_number", length = 20, nullable = true, unique = false, updatable = true)
+    @Column(name = "user_phone_number", length = 20, nullable = true, unique = true, updatable = true)
     private String phoneNumber;
 
-    @Column(name = "user_status", nullable = false, updatable = false, columnDefinition = "TINYINT")
+    @Column(name = "user_status", nullable = false, updatable = true, columnDefinition = "TINYINT")
     @Convert(converter = UserStatusConverter.class)
     private UserStatus userStatus;
 
@@ -66,4 +66,27 @@ public class User extends BaseTime {
         this.profileImageUrl = profileImageUrl;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void setProfileImageKey(String profileImageKey) {
+        this.profileImageKey = profileImageKey;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
 }

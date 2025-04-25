@@ -5,15 +5,16 @@ import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
+import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
-import com.grimeet.grimeet.domain.user.dto.UserStatus;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
+import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class AuthServiceImpl implements AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
   private final UserDetailServiceImpl userDetailService;
   private final UserRepository userRepository;
+  private final UserLogFacade userLogFacade;
   private final BCryptPasswordEncoder passwordEncoder;
 
   @Override
@@ -39,23 +41,19 @@ public class AuthServiceImpl implements AuthService {
 
     String encryptedPassword = passwordEncoder.encode(userCreateRequestDto.getPassword());
 
-    User createdUser = User.builder()
-            .name(userCreateRequestDto.getName())
-            .email(userCreateRequestDto.getEmail())
-            .password(encryptedPassword)
-            .nickname(userCreateRequestDto.getNickname())
-            .phoneNumber(userCreateRequestDto.getPhoneNumber())
-            .userStatus(UserStatus.NORMAL)
-            .build();
+    User createdUser = userCreateRequestDto.toEntity(userCreateRequestDto, encryptedPassword);
 
     userRepository.save(createdUser);
+    // 회원가입 시 사용자 로그 생성
+    userLogFacade.createUserLog(createdUser.getId());
+
 
     return new UserResponseDto(createdUser);
   }
 
   private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {
     if(userRepository.existsByEmail(userCreateRequestDto.getEmail())) {
-      throw new GrimeetException(ExceptionStatus.LOGIN_ID_ALREADY_EXISTS);
+      throw new GrimeetException(ExceptionStatus.EMAIL_ALREADY_EXISTS);
     }
     if(userRepository.existsByNickname(userCreateRequestDto.getNickname())) {
       throw new GrimeetException(ExceptionStatus.NICKNAME_ALREADY_EXISTS);
@@ -69,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
    */
   @Override
   @Transactional
-  public AuthResponseDto createAccessToken(String refreshToken) {
+  public TokenRefreshResponseDto createAccessToken(String refreshToken) {
     if(!jwtUtil.validateRefreshToken(refreshToken)) {
       throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
     }
@@ -83,20 +81,22 @@ public class AuthServiceImpl implements AuthService {
 
     String newAccessToken = jwtUtil.generateAccessToken((UserPrincipalDetails) findUserDetail);
 
-    rotateRefreshToken(findUserDetail, findRefreshToken);
+    String newRefreshToken = rotateRefreshToken(findUserDetail, findRefreshToken);
 
-    return new AuthResponseDto(newAccessToken);
+    return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
   }
 
   @Transactional
-  public void rotateRefreshToken(UserDetails userDetails, RefreshToken refreshToken) {
+  public String rotateRefreshToken(UserDetails userDetails, RefreshToken refreshToken) {
     String newRefreshToken = jwtUtil.generateRefreshToken((UserPrincipalDetails) userDetails);
     refreshToken.updateToken(newRefreshToken);
+    refreshTokenRepository.save(refreshToken);
+    return newRefreshToken;
   }
 
   @Override
   @Transactional
-  public String login(UserLoginRequestDto userLoginRequestDto) {
+  public AuthResponseDto login(UserLoginRequestDto userLoginRequestDto) {
     UserDetails findUserDetails = userDetailService.loadUserByUsername(userLoginRequestDto.getEmail());
     User findUser = verifyExistUserToUseUserDetail(findUserDetails);
 
@@ -112,42 +112,34 @@ public class AuthServiceImpl implements AuthService {
     String refreshToken = jwtUtil.generateRefreshToken((UserPrincipalDetails) findUserDetails);
 
 
-    refreshTokenRepository.findByEmail(findUser.getEmail()).ifPresentOrElse(
-            findRefreshToken -> { // 이미 Refresh Token이 있으면 업데이트
-              findRefreshToken.updateToken(refreshToken);
-              refreshTokenRepository.save(findRefreshToken);
-            },
-            () -> { // Refresh Token이 없으면 새로 생성
-              RefreshToken newRefreshToken = new RefreshToken(findUser.getEmail(), refreshToken); //userId사용하는 생성자로 변경
-              refreshTokenRepository.save(newRefreshToken);
-            }
-    );
+    String savedRefreshToken = saveOrUpdateRefreshToken(findUser, refreshToken);
+
+    // 비밀번호 변경 권장 알림 체크
+    boolean checkChangePasswordRequired = userLogFacade.checkNotificationRequired(findUser.getId());
+    // 휴면 계정 여부 체크
+    boolean checkDormantAccount = userLogFacade.checkDormantUserLog(findUser.getId());
 
     // accessToken 반환
-    return accessToken;
+    return AuthResponseDto.builder()
+            .accessToken(accessToken)
+            .refreshToken(savedRefreshToken)
+            .isPasswordChangeRequired(checkChangePasswordRequired)
+            .isDormant(checkDormantAccount)
+            .build();
   }
 
-  @Override
-  @Transactional
-  public void logout(String userEmail) {
-    RefreshToken findRefreshToken = verifyExistRefreshTokenByUsername(userEmail);
-    String findUsername = jwtUtil.getUsernameFromRefreshToken(findRefreshToken.getToken());
-    verifyExistUsername(findUsername);
-
-    findRefreshToken.updateToken("");
-  }
-
-  private void verifyExistUsername(String findUsername) {
-    userRepository.findByEmail(findUsername).orElseThrow(() -> {
-      throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-    });
-  }
-
-
-  private RefreshToken verifyExistRefreshTokenByRefreshToken(String refreshToken) {
-    return refreshTokenRepository.findByToken(refreshToken).orElseThrow(() -> {
-      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
-    });
+  private String saveOrUpdateRefreshToken(User findUser, String newRefreshToken) {
+    return refreshTokenRepository.findByEmail(findUser.getEmail())
+            .map(existingToken -> {
+              existingToken.updateToken(newRefreshToken);
+              refreshTokenRepository.save(existingToken);
+              return existingToken.getToken(); // 반환
+            })
+            .orElseGet(() -> {
+              RefreshToken createdToken = new RefreshToken(findUser.getEmail(), newRefreshToken);
+              refreshTokenRepository.save(createdToken);
+              return createdToken.getToken();
+            });
   }
 
   private User verifyExistUserToUseUserDetail(UserDetails findUserDetail) {
