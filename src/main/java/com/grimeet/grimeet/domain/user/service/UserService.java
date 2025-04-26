@@ -33,4 +33,6 @@ public interface UserService {
     // 유저 프로필 이미지 삭제
     UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto);
 
+    // 유저 아이디(이메일) 찾기
+    String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto);
 }

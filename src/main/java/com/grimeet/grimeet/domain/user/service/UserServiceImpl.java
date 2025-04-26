@@ -172,6 +172,13 @@ public class UserServiceImpl implements UserService {
         return new UserResponseDto(user);
     }
 
+    @Override
+    public String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto) {
+        String email = userRepository.findEmailByNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+        return email;
+    }
+
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {
         if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
             throw new GrimeetException(ExceptionStatus.INVALID_PASSWORD);
