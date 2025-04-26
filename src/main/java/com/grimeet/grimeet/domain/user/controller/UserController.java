@@ -106,6 +106,12 @@ public class UserController {
         return ResponseEntity.ok(responseDto);
     }
 
+    @Operation(summary = "사용자 계정(이메일) 찾기", description = "기존 사용자의 계정(이메일)을 이름, 전화번호로 찾습니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 계정 찾기 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
+    })
+    @PostMapping("/find/email")
     public ResponseEntity<String> findUserEmail(@Valid @RequestBody UserFindEmailRequestDto requestDto) {
         String email = userService.findUserEmailByNameAndPhoneNumber(requestDto);
         return ResponseEntity.ok(email);
