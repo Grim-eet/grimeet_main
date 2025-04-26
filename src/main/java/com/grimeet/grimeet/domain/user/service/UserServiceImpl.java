@@ -3,6 +3,7 @@ package com.grimeet.grimeet.domain.user.service;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.image.ProfileImageUtils;
+import com.grimeet.grimeet.common.mail.service.MailService;
 import com.grimeet.grimeet.common.util.user.TempPasswordGenerator;
 import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
@@ -30,6 +31,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserLogFacade userLogFacade;
     private final S3ImageService s3ImageService;
+    private final MailService mailService;
 
     // email로 유저 찾기
     @Transactional
@@ -192,7 +194,7 @@ public class UserServiceImpl implements UserService {
         userLogFacade.updatePasswordLog(user.getId());
 
         // 이메일 발송
-
+        mailService.sendEmail(user.getEmail(), "[Grimeet] 임시 비밀번호 발급", "[임시 비밀번호] " + tempPassword);
 
     }
 
