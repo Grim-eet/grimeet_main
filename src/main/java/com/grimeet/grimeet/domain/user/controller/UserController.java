@@ -118,7 +118,11 @@ public class UserController {
         return ResponseEntity.ok(email);
     }
 
-    @Operation(summary = "사용자 비밀번호 찾기", description = "기존 사용자의 비밀번호를 임시 값으로 설정하고, 이메일로 전송한다.")
+    @Operation(summary = "사용자 비밀번호 찾기", description = "기존 사용자의 비밀번호를 임시 값으로 설정하고, 이메일로 발급한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 이메일로 임시 비밀번호 발급 완료 "),
+            @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
+    })
     @PostMapping("/find/password")
     public ResponseEntity<Void> findUserPasswordByEmail(@Valid @RequestBody UserFindPasswordRequestDto requestDto) {
         userService.findUserPasswordByEmail(requestDto);
