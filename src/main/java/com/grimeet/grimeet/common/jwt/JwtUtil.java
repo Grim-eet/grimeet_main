@@ -145,15 +145,11 @@ public class JwtUtil {
     return false;
   }
 
-  // Cookie에서 JWT Token 추출
   public String resolveToken(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for (Cookie cookie : cookies) {
-        if ("Authorization_Access".equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
+    String authorizationHeader = request.getHeader(header);
+
+    if (authorizationHeader != null && authorizationHeader.startsWith(tokenPrefix)) {
+      return authorizationHeader.substring(tokenPrefix.length()); // "Bearer " 이후 토큰 부분만 추출
     }
     return null;
   }

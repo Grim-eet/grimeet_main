@@ -36,40 +36,30 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     try {
-      String token = extractTokenFromCookie(request);
+      String token = jwtUtil.resolveToken(request);
       if(token == null) {
         token = jwtUtil.resolveToken(request);
       }
       if (token != null && jwtUtil.validateAccessToken(token)) {
         String username = jwtUtil.getUsernameFromAccessToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        if (userDetails != null) {
+          UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                  userDetails, null, userDetails.getAuthorities());
+          authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+          SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        } else {
+          logger.error("User not found for username extracted from token: " + username);
+          SecurityContextHolder.clearContext(); // 이 경우 인증 비우기
+        }
       }
+
     } catch (Exception e) {
       // 토큰 처리 중 발생한 예외를 로깅하지만, 필터 체인은 계속 진행
       logger.error("Cannot set user authentication: " + e.getMessage());
       SecurityContextHolder.clearContext(); // 인증 컨텍스트 초기화
     }
     filterChain.doFilter(request, response);
-  }
-
-  /**
-   * Cookie에서 Token 추출
-   * @param request
-   * @return cookie에 저장된 token
-   */
-  private String extractTokenFromCookie(HttpServletRequest request) {
-    Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      for(Cookie cookie : cookies) {
-        if("Authorization_Access".equals(cookie.getName())) {
-          return cookie.getValue();
-        }
-      }
-    }
-    return null;
   }
 }

@@ -26,7 +26,6 @@ public class SecurityConfig {
   private final CorsConfig corsConfig;
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtUtil jwtUtil;
-  public static final String ACCESS_TOKEN_COOKIE_NAME = "Authorization_Access";
 
   /**
    * AuthenticationManager 빈 등록
@@ -87,9 +86,6 @@ public class SecurityConfig {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                       } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                      } finally {
-                        // 쿠키 삭제
-                        removeCookie(response);
                       }
                     })
 
@@ -97,15 +93,5 @@ public class SecurityConfig {
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  private static void removeCookie(HttpServletResponse response) {
-    Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, null);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setSecure(false);
-//    cookie.setDomain("grimeet.com");
-    response.addCookie(cookie);
   }
 }
