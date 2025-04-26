@@ -3,6 +3,7 @@ package com.grimeet.grimeet.domain.user.service;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.image.ProfileImageUtils;
+import com.grimeet.grimeet.common.util.user.TempPasswordGenerator;
 import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
@@ -185,11 +186,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         // 임시 비밀빈호 발급
-        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        String tempPassword = TempPasswordGenerator.generate();
         // 사용자 비밀번호 변경
         user.setPassword(passwordEncoder.encode(tempPassword));
         userLogFacade.updatePasswordLog(user.getId());
 
+        // 이메일 발송
 
 
     }
