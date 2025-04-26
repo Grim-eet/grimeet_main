@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public UserResponseDto register(UserCreateRequestDto userCreateRequestDto) {
     log.info("User Create Request : {}", userCreateRequestDto);
+    verifyEmailAuthPass(userCreateRequestDto);
     verifyExistUser(userCreateRequestDto);
 
     String encryptedPassword = passwordEncoder.encode(userCreateRequestDto.getPassword());
@@ -47,8 +48,13 @@ public class AuthServiceImpl implements AuthService {
     // 회원가입 시 사용자 로그 생성
     userLogFacade.createUserLog(createdUser.getId());
 
-
     return new UserResponseDto(createdUser);
+  }
+
+  private void verifyEmailAuthPass(UserCreateRequestDto userCreateRequestDto) {
+    if (Boolean.FALSE.equals(userCreateRequestDto.getIsPassedEmailAuth())) {
+      throw new GrimeetException(ExceptionStatus.INVALID_USER_EMAIL_AUTH);
+    }
   }
 
   private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {
