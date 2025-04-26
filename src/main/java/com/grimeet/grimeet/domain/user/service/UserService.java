@@ -35,4 +35,7 @@ public interface UserService {
 
     // 유저 아이디(이메일) 찾기
     String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto);
+
+    // 유저 비밀번호 찾기
+    void findUserPasswordByEmail(UserFindPasswordRequestDto requestDto);
 }

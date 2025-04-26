@@ -3,7 +3,7 @@ package com.grimeet.grimeet.domain.auth.service;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;

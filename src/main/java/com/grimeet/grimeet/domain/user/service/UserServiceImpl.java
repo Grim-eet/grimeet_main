@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -174,9 +175,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto) {
-        String email = userRepository.findEmailByNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber())
+        return userRepository.findEmailByNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
-        return email;
+    }
+
+    @Override
+    public void findUserPasswordByEmail(UserFindPasswordRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        // 임시 비밀빈호 발급
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        // 사용자 비밀번호 변경
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userLogFacade.updatePasswordLog(user.getId());
+
+
+
     }
 
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {

@@ -1,6 +1,6 @@
 package com.grimeet.grimeet.common.filter;
 
-import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.user.service.UserDetailServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

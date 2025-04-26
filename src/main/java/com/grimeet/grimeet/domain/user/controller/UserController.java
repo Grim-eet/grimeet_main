@@ -2,6 +2,7 @@ package com.grimeet.grimeet.domain.user.controller;
 
 
 import com.grimeet.grimeet.domain.user.dto.*;
+import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -111,9 +112,17 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "사용자 계정 찾기 성공"),
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
     })
-    @PostMapping("/find/email")
+    @GetMapping("/find/email")
     public ResponseEntity<String> findUserEmail(@Valid @RequestBody UserFindEmailRequestDto requestDto) {
         String email = userService.findUserEmailByNameAndPhoneNumber(requestDto);
         return ResponseEntity.ok(email);
     }
+
+    @Operation(summary = "사용자 비밀번호 찾기", description = "기존 사용자의 비밀번호를 임시 값으로 설정하고, 이메일로 전송한다.")
+    @PostMapping("/find/password")
+    public ResponseEntity<Void> findUserPasswordByEmail(@Valid @RequestBody UserFindPasswordRequestDto requestDto) {
+        userService.findUserPasswordByEmail(requestDto);
+        return ResponseEntity.ok().build();
+    }
+
 }
