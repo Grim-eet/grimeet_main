@@ -2,17 +2,14 @@ package com.grimeet.grimeet.domain.user.controller;
 
 
 import com.grimeet.grimeet.domain.user.dto.*;
-import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +20,17 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+
+    @Operation(summary = "사용자 정보 조회", description = "사용자의 정보 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공", content = @Content),
+            @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
+    })
+    @GetMapping("/get/user-info")
+    public ResponseEntity<UserResponseDto> getUserInfo(@Valid @RequestBody UserFindMyInfoRequestDto requestDto) {
+        UserResponseDto responseDto = userService.findUserByEmail(requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
 
     @Operation(summary = "탈퇴 회원으로 전환", description = "사용자 상태를 'WITHDRAWAL'로 변경합니다.")
     @ApiResponses({

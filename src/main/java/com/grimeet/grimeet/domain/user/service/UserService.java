@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserService {
 
     // email로 유저 찾기
-    UserResponseDto findUserByEmail(String email);
+    UserResponseDto findUserByEmail(UserFindMyInfoRequestDto requestDto);
 
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);

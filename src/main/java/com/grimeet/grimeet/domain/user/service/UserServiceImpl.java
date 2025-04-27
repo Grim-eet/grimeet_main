@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -34,11 +33,16 @@ public class UserServiceImpl implements UserService {
     private final MailService mailService;
     private final TempPasswordGenerator tempPasswordGenerator; // 임시 비밀번호 생성기
 
-    // email로 유저 찾기
+    /**
+     * 이메일로 사용자 조회
+     * 조회 성공 시 사용자 정보 반환
+     * @param requestDto
+     * @return UserResonseDto(user)
+     */
     @Transactional
     @Override
-    public UserResponseDto findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
+    public UserResponseDto findUserByEmail(UserFindMyInfoRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         return new UserResponseDto(user);
     }
