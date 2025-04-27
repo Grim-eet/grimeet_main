@@ -1,6 +1,8 @@
 spring:
   application:
     name: grimeet
+  profiles:
+    include: oauth
   jackson:
     time-zone: Asia/Seoul
   datasource:
@@ -24,7 +26,6 @@ spring:
     redis:
     host: localhost
     port: 6380
-  # include: oauth
   servlet:
     encoding:
       charset: UTF-8

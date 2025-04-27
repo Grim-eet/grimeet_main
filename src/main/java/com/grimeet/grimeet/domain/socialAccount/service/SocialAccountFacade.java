@@ -21,17 +21,37 @@ public class SocialAccountFacade {
   private final SocialAccountRepository socialAccountRepository;
   private final UserFacade userFacade;
 
-  public SocialAccount findByProviderAndSocialIdOrThrow(Provider provider, String socialId) {
-    return socialAccountRepository.findBySocialIdAndProvider(socialId, provider)
+  /**
+   * 소셜 계정 존재 여부 확인
+   *
+   * @param provider Provider, socialId String
+   * @return SocialAccount
+   */
+  public SocialAccountResponseDto findByProviderAndSocialIdOrThrow(Provider provider, String socialId) {
+    SocialAccount socialAccount = socialAccountRepository.findBySocialIdAndProvider(socialId, provider)
             .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+    return SocialAccountResponseDto.builder()
+            .socialId(socialAccount.getSocialId())
+            .provider(String.valueOf(provider))
+            .build();
   }
 
   /**
-   * 소셜 계정 연동
+   * 소셜 계정 존재 여부 확인
    *
-   * @param username String, socialAccountRequestDto SocialAccountRequestDto
-   * @return socialAccountResponseDto
+   * @param provider Provider, socialId String
+   * @return boolean
    */
+  public boolean existsByProviderAndSocialId(Provider provider, String socialId) {
+    return socialAccountRepository.findBySocialIdAndProvider(socialId, provider).isPresent();
+  }
+
+    /**
+     * 소셜 계정 연동
+     *
+     * @param username String, socialAccountRequestDto SocialAccountRequestDto
+     * @return socialAccountResponseDto
+     */
   public SocialAccountResponseDto linkSocialAccount(String username, SocialAccountRequestDto socialAccountRequestDto) {
     // 사용자 ID 조회
     UserResponseDto findUser = userFacade.findUserByEmail(username);

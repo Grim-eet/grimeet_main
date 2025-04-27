@@ -10,6 +10,9 @@ public enum ExceptionStatus {
   INVALID_USER_LOGIN_INFO(HttpStatus.BAD_REQUEST, 400, "아이디 혹은 비밀번호가 일치하지 않습니다."),
   UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, 401, "로그인이 필요합니다."),
   SOCIAL_ACCOUNT_ALREADY_LINKED(HttpStatus.BAD_REQUEST, 400, "이미 연동된 소셜 계정입니다."),
+  OAUTH2_USERINFO_NOT_FOUND(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 정보가 없습니다."),
+  OAUTH2_ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 Access Token이 없습니다."),
+  OAUTH2_ACCESS_TOKEN_FAILED(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 Access Token 발급에 실패했습니다."),
 
   // JWT
   UN_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, 401, "토큰 정보가 없습니다."),
