@@ -2,6 +2,8 @@ package com.grimeet.grimeet.domain.user.controller;
 
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,10 +28,14 @@ public class UserController {
     @Operation(summary = "사용자 정보 조회", description = "사용자의 정보 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공", content = @Content),
-            @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
+            @ApiResponse(responseCode = "403", description = "접근할 수 없습니다.", content = @Content),
+            @ApiResponse(responseCode = "404", description = "일치하는 유저를 찾을 수 없습니다.", content = @Content),
     })
     @GetMapping("/get/user-info")
     public ResponseEntity<UserResponseDto> getUserInfo(@AuthenticationPrincipal UserPrincipalDetails userDetails) {
+        if (userDetails == null) {
+            throw new GrimeetException(ExceptionStatus.INVALID_ROLE);
+        }
         UserResponseDto responseDto = userService.findUserByEmail(userDetails.getUser().getId());
         return ResponseEntity.ok(responseDto);
     }
