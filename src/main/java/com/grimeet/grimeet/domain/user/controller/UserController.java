@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.domain.user.controller;
 
 
+import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -27,8 +29,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
     })
     @GetMapping("/get/user-info")
-    public ResponseEntity<UserResponseDto> getUserInfo(@Valid @RequestBody UserFindMyInfoRequestDto requestDto) {
-        UserResponseDto responseDto = userService.findUserByEmail(requestDto);
+    public ResponseEntity<UserResponseDto> getUserInfo(@AuthenticationPrincipal UserPrincipalDetails userDetails) {
+        UserResponseDto responseDto = userService.findUserByEmail(userDetails.getUser().getId());
         return ResponseEntity.ok(responseDto);
     }
 

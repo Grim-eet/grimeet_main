@@ -36,13 +36,13 @@ public class UserServiceImpl implements UserService {
     /**
      * 이메일로 사용자 조회
      * 조회 성공 시 사용자 정보 반환
-     * @param requestDto
+     * @param id
      * @return UserResonseDto(user)
      */
     @Transactional
     @Override
-    public UserResponseDto findUserByEmail(UserFindMyInfoRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto findUserByEmail(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         return new UserResponseDto(user);
     }
