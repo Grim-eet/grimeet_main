@@ -33,7 +33,16 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 
     // 에러 메시지 구성
     Map<String, String> errorResponse = new ConcurrentHashMap<>();
-    errorResponse.put("error", "Authentication Failed");
+    String errorCode = "OAUTH2_AUTHENTICATION_FAILED";
+
+    if (exception.getMessage().contains("redirect_uri")) {
+      errorCode = "INVALID_REDIRECT_URI";
+    }
+    if (exception.getMessage().contains("access_denied")) {
+      errorCode = "USER_DENIED_CONSENT";
+    }
+
+    errorResponse.put("error", errorCode);
     errorResponse.put("status", String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
     errorResponse.put("message", exception.getMessage());
 
