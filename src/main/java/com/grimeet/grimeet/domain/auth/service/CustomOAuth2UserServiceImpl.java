@@ -1,15 +1,9 @@
 package com.grimeet.grimeet.domain.auth.service;
 
 import com.grimeet.grimeet.common.config.oauth.info.OAuthAttributes;
-import com.grimeet.grimeet.common.exception.ExceptionStatus;
-import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.domain.auth.dto.Provider;
-import com.grimeet.grimeet.domain.auth.repository.SocialAccountRepository;
+import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
 import com.grimeet.grimeet.domain.socialAccount.entity.SocialAccount;
 import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
-import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
-import com.grimeet.grimeet.domain.user.entity.User;
-import com.grimeet.grimeet.domain.user.service.UserFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,15 +30,17 @@ public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
     OAuthAttributes attributes = OAuthAttributes.of(
             userRequest.getClientRegistration().getRegistrationId(),
             userRequest.getClientRegistration().getProviderDetails()
-            .getUserInfoEndpoint().getUserNameAttributeName(),
+                    .getUserInfoEndpoint().getUserNameAttributeName(),
             oAuth2User.getAttributes()
     );
 
     String registrationId = userRequest.getClientRegistration().getRegistrationId();
     String socialId = attributes.getSocialId();
 
-    SocialAccount socialAccount = socialAccountFacade.findByProviderAndSocialIdOrThrow(attributes.get, socialId);
-    Long userId = socialAccount.getUserId();
+    socialAccountFacade.findByProviderAndSocialIdOrThrow(
+            Provider.valueOf(registrationId.toUpperCase()),
+            socialId
+    );
 
 
     return new DefaultOAuth2User(
