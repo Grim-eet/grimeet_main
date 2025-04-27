@@ -43,18 +43,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-
-    @Operation(summary = "휴면 회원으로 전환", description = "사용자 상태를 'DORMANT'로 변경합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "상태 변경 완료", content = @Content),
-            @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
-    })
-    @PatchMapping("/update/userStatus/dormant")
-    public ResponseEntity<UserResponseDto> updateUserStatusDormant(@Valid @RequestBody UserUpdateStatusRequestDto requestDto) {
-        userService.updateUserStatusDormant(requestDto.getEmail());
-        return ResponseEntity.ok().build();
-    }
-
     @Operation(summary = "일반 회원으로 전환", description = "사용자 상태를 'NORMAL'로 변경합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "상태 변경 완료", content = @Content),

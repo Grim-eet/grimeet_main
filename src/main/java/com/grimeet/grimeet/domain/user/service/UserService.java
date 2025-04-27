@@ -12,9 +12,6 @@ public interface UserService {
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
 
-    // 휴면 회원으로 전환
-    void updateUserStatusDormant(String email);
-
     // 스케줄러 -> 휴면 회원들로 전환
     void updateUserStatusDormantBatch(List<Long> ids);
 

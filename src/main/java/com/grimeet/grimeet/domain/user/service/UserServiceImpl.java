@@ -84,19 +84,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    // 유저 상태 휴면 전환
-    @Transactional
-    @Override
-    public void updateUserStatusDormant(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-        }
-        User user = optionalUser.get();
-        user.setUserStatus(UserStatus.DORMANT);
-    }
-
     // 유저 상태 일반 전환
     @Transactional
     @Override
