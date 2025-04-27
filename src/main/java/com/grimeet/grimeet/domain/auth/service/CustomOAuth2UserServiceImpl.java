@@ -1,8 +1,15 @@
 package com.grimeet.grimeet.domain.auth.service;
 
 import com.grimeet.grimeet.common.config.oauth.info.OAuthAttributes;
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
+import com.grimeet.grimeet.domain.auth.dto.Provider;
 import com.grimeet.grimeet.domain.auth.repository.SocialAccountRepository;
-import com.grimeet.grimeet.domain.user.repository.UserRepository;
+import com.grimeet.grimeet.domain.socialAccount.entity.SocialAccount;
+import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
+import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
+import com.grimeet.grimeet.domain.user.entity.User;
+import com.grimeet.grimeet.domain.user.service.UserFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,28 +24,33 @@ import java.util.Collections;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserServiceImpl extends DefaultOAuth2UserService {
-  private final UserRepository userRepository;
-  private final SocialAccountRepository socialAccountRepository;
 
-  public CustomOAuth2UserServiceImpl(UserRepository userRepository, SocialAccountRepository socialAccountRepository) {
-    super();
-    this.userRepository = userRepository;
-    this.socialAccountRepository = socialAccountRepository;
-  }
+  private final SocialAccountFacade socialAccountFacade;
+
 
   @Override
   public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
     OAuth2User oAuth2User = super.loadUser(userRequest);
+    OAuthAttributes attributes = OAuthAttributes.of(
+            userRequest.getClientRegistration().getRegistrationId(),
+            userRequest.getClientRegistration().getProviderDetails()
+            .getUserInfoEndpoint().getUserNameAttributeName(),
+            oAuth2User.getAttributes()
+    );
+
     String registrationId = userRequest.getClientRegistration().getRegistrationId();
-    String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails()
-            .getUserInfoEndpoint().getUserNameAttributeName();
-    OAuthAttributes oAuthAttributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
+    String socialId = attributes.getSocialId();
+
+    SocialAccount socialAccount = socialAccountFacade.findByProviderAndSocialIdOrThrow(attributes.get, socialId);
+    Long userId = socialAccount.getUserId();
+
 
     return new DefaultOAuth2User(
             Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-            oAuthAttributes.getAttributes(),
-            oAuthAttributes.getNameAttributeKey()
+            attributes.getAttributes(),
+            attributes.getNameAttributeKey()
     );
   }
 

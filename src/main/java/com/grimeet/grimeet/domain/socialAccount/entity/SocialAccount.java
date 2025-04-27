@@ -1,8 +1,10 @@
-package com.grimeet.grimeet.domain.auth.entity;
+package com.grimeet.grimeet.domain.socialAccount.entity;
 
 import com.grimeet.grimeet.common.entity.BaseTime;
-import com.grimeet.grimeet.domain.auth.dto.Provider;
+import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
+import com.grimeet.grimeet.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +12,13 @@ import lombok.NoArgsConstructor;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "social_accounts")
+@Table(name = "social_accounts",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"provider", "social_id"})
+        }
+)
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SocialAccount extends BaseTime {
 
   @Id
@@ -35,4 +41,5 @@ public class SocialAccount extends BaseTime {
     this.provider = provider;
     this.userId = userId;
   }
+
 }
