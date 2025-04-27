@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Schema(description = "로그인 요청 - controller layer")
 public class UserLoginRequestDto {
 
   @Schema(description = "이메일(로그인 아이디)", example = "testUser@example.com")
