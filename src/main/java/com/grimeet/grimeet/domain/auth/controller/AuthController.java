@@ -79,7 +79,15 @@ public class AuthController {
   public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
           @RequestHeader("Authorization") String authorizationHeader
   ) {
-    TokenRefreshResponseDto response = authService.createAccessToken(authorizationHeader);
+    String refreshToken = extractToken(authorizationHeader); // "Bearer " 제거
+    TokenRefreshResponseDto response = authService.createAccessToken(refreshToken);
     return ResponseEntity.ok(response);
+  }
+
+  private String extractToken(String tokenHeader) {
+    if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+      return tokenHeader.substring("Bearer ".length());
+    }
+    throw new IllegalArgumentException("잘못된 Authorization 헤더 형식입니다.");
   }
 }

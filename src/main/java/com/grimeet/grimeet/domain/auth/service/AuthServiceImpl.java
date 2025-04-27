@@ -91,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
     RefreshToken storedToken = findRefreshToken(username);
 
     if (!storedToken.getToken().equals(refreshToken)) {
-      throw new GrimeetException(ExceptionStatus.INVALID_REFRESH_TOKEN);
+      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
     }
 
     UserDetails userDetails = userDetailService.loadUserByUsername(username);
@@ -165,9 +165,14 @@ public class AuthServiceImpl implements AuthService {
     });
   }
 
-  private RefreshToken verifyExistRefreshTokenByUsername(String findUsername) {
-    return refreshTokenRepository.findByEmail(findUsername).orElseThrow(() -> {
-      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
-    });
+  private RefreshToken findRefreshToken(String username) {
+    return refreshTokenRepository.findByEmail(username)
+            .orElseThrow(() -> new GrimeetException(ExceptionStatus.UN_AUTHENTICATION_TOKEN));
+  }
+
+  private void validateUserDetails(UserDetails userDetails) {
+    if (userDetails == null) {
+      throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+    }
   }
 }
