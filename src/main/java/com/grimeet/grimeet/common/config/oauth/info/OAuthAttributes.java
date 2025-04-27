@@ -27,7 +27,7 @@ public class OAuthAttributes {
     return OAuthAttributes.builder()
             .name((String) attributes.get("name"))
             .email((String) attributes.get("email"))
-            .socialId((String) attributes.get(userNameAttributeName))
+            .socialId((String) attributes.get("id"))
             .attributes(attributes)
             .nameAttributeKey(userNameAttributeName)
             .build();

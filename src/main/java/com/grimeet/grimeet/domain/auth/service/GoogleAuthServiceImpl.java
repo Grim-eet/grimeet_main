@@ -98,6 +98,10 @@ public class GoogleAuthServiceImpl {
       );
 
       Map<String, Object> userInfo = response.getBody();
+      if (userInfo == null || !userInfo.containsKey("id")) {
+        throw new GrimeetException(ExceptionStatus.OAUTH2_USERINFO_NOT_FOUND);
+      }
+      log.info("📨 Google User Info response: {}", userInfo);
 
       return new GoogleOAuthUserInfo(userInfo);
 

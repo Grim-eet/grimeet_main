@@ -6,7 +6,7 @@ spring:
           google:
             client-id: ${GRIM_GOOGLE_CLIENT_KEY}
             client-secret: ${GRIM_GOOGLE_CLIENT_SECRET_KEY}
-            redirect-uri: ${GRIM_GOOGLE_REDIRECT_URI}
+            redirect-uri: ${GRIM_GOOGLE_CALLBACK_URI_LOCAL}
             scope: profile,email
           naver:
             client-id: ${GRIM_NAVER_CLIENT_KEY}
