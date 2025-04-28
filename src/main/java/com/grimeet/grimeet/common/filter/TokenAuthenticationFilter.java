@@ -37,9 +37,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     try {
       String token = jwtUtil.resolveToken(request);
-      if(token == null) {
-        token = jwtUtil.resolveToken(request);
-      }
+
       if (token != null && jwtUtil.validateAccessToken(token)) {
         String username = jwtUtil.getUsernameFromAccessToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -57,7 +55,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     } catch (Exception e) {
       // 토큰 처리 중 발생한 예외를 로깅하지만, 필터 체인은 계속 진행
-      logger.error("Cannot set user authentication: " + e.getMessage());
+      logger.error("Cannot set user authentication: " + e);
+
       SecurityContextHolder.clearContext(); // 인증 컨텍스트 초기화
     }
     filterChain.doFilter(request, response);
