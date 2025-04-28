@@ -2,6 +2,7 @@ package com.grimeet.grimeet.common.config.oauth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
@@ -13,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -30,7 +32,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
   private final JwtUtil jwtUtil;
   private final UserFacade userFacade;
   private final RefreshTokenRepository refreshTokenRepository;
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
 
   private final String AUTH_HEADER = "Authorization";
   private final String TOKEN_PREFIX = "Bearer ";
@@ -46,9 +48,10 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     // 2. Attribute에서 email 정보 추출
     String email = (String) attributes.get("email");
 
+    UserResponseDto findUserDto;
     try {
-      userFacade.findUserByEmail(email);
-    } catch (IllegalArgumentException e) {
+      findUserDto = userFacade.findUserByEmail(email);
+    } catch (GrimeetException e) {
       // 기존 회원이 아닌 경우 회원가입 처리
       log.info("🟠 [OAuth2 Authentication Success Handler] User not found. Need signup");
 
@@ -65,7 +68,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     }
 
     // 3. ✅ 기존 회원인 경우 JWT 토큰 생성
-    User findUser = userFacade.findUserByEmail(email).toEntity();
+    User findUser = findUserDto.toEntity();
     UserPrincipalDetails userPrincipal = new UserPrincipalDetails(
             findUser,
             List.of(() -> "ROLE_USER")
@@ -75,17 +78,27 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     String refreshToken = jwtUtil.generateRefreshToken(userPrincipal);
 
     // 4. RefreshToken 저장
-    refreshTokenRepository.findByEmail(findUser.getEmail())
-            .ifPresentOrElse(
-                    existingToken -> {
-                      existingToken.updateToken(refreshToken);  // 기존 Refresh Token이 있으면 업데이트
-                      refreshTokenRepository.save(existingToken);
-                    },
-                    () -> {
-                      // 기존이 없으면 새로 생성
-                      refreshTokenRepository.save(new RefreshToken(findUser.getEmail(), refreshToken));
-                    }
-            );
+    try {
+      refreshTokenRepository.findByEmail(findUser.getEmail())
+              .ifPresentOrElse(
+                      existingToken -> {
+                        existingToken.updateToken(refreshToken);
+                        refreshTokenRepository.save(existingToken);
+                      },
+                      () -> {
+                        refreshTokenRepository.save(new RefreshToken(findUser.getEmail(), refreshToken));
+                      }
+              );
+    } catch (DataIntegrityViolationException e) {
+      log.warn("⚠️ [OAuth2 Success Handler] RefreshToken 저장 중 중복 발생. 기존 토큰을 갱신 시도합니다.", e);
+
+      // 이미 다른 스레드가 저장했을 가능성 있음 → 그냥 update 시도
+      refreshTokenRepository.findByEmail(findUser.getEmail())
+              .ifPresent(existingToken -> {
+                existingToken.updateToken(refreshToken);
+                refreshTokenRepository.save(existingToken);
+              });
+    }
 
     // 5. Response Header에 AccessToken 추가
     response.setHeader(AUTH_HEADER, TOKEN_PREFIX + accessToken);
