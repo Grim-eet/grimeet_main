@@ -36,7 +36,7 @@ public class SocialAccountController {
           }
   )
   @PostMapping()
-  public ResponseEntity<SocialAccountResponseDto> linkeSocialAccount(
+  public ResponseEntity<SocialAccountResponseDto> linkSocialAccount(
           @AuthenticationPrincipal UserPrincipalDetails principal,
           @Valid @RequestBody SocialAccountRequestDto socialAccountRequestDto
           ) {
