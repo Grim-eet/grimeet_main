@@ -21,11 +21,13 @@ public class GoogleOAuthUserInfo implements OAuthUserInfo {
 
   @Override
   public String getName() {
-    return (String) attributes.get("name");
+    Object name = attributes.get("name");
+    return name != null ? name.toString() : null;
   }
 
   @Override
   public String getEmail() {
-    return (String) attributes.get("email");
+    Object email = attributes.get("email");
+    return email != null ? email.toString() : null;
   }
 }
