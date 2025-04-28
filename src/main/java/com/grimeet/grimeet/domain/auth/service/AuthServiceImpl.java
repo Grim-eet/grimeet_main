@@ -3,7 +3,7 @@ package com.grimeet.grimeet.domain.auth.service;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public UserResponseDto register(UserCreateRequestDto userCreateRequestDto) {
     log.info("User Create Request : {}", userCreateRequestDto);
+    verifyEmailAuthPass(userCreateRequestDto);
     verifyExistUser(userCreateRequestDto);
 
     String encryptedPassword = passwordEncoder.encode(userCreateRequestDto.getPassword());
@@ -47,8 +48,13 @@ public class AuthServiceImpl implements AuthService {
     // 회원가입 시 사용자 로그 생성
     userLogFacade.createUserLog(createdUser.getId());
 
-
     return new UserResponseDto(createdUser);
+  }
+
+  private void verifyEmailAuthPass(UserCreateRequestDto userCreateRequestDto) {
+    if (Boolean.FALSE.equals(userCreateRequestDto.getIsPassedEmailAuth())) {
+      throw new GrimeetException(ExceptionStatus.INVALID_USER_EMAIL_AUTH);
+    }
   }
 
   private void verifyExistUser(UserCreateRequestDto userCreateRequestDto) {

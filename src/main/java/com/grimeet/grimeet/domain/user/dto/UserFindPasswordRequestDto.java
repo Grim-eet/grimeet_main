@@ -6,13 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "사용자 프로필 이미지 삭제 요청 DTO")
-public class UserDeleteProfileImageRequestDto {
+@Schema(description = "사용자 비밀번호 찾기 요청 DTO")
+public class UserFindPasswordRequestDto {
 
     @Schema(description = "이메일(로그인 아이디)", example = "testUser@example.com")
     @Email

@@ -1,7 +1,7 @@
 package com.grimeet.grimeet.common.config.security;
 
 import com.grimeet.grimeet.common.filter.TokenAuthenticationFilter;
-import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;

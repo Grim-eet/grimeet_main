@@ -41,6 +41,10 @@ public class UserCreateRequestDto {
   @Size(max = 15)
   private String phoneNumber;
 
+  @Schema(description = "이메일 인증 확인 여부", example = "true")
+  @NotNull
+  private Boolean isPassedEmailAuth;
+
   public User toEntity(UserCreateRequestDto userCreateRequestDto, String encryptedPassword) {
     return User.builder()
             .name(userCreateRequestDto.getName())

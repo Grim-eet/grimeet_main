@@ -30,4 +30,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByPhoneNumber(String phoneNumber);
 
+    @Query("""
+        SELECT u.email FROM User u
+        WHERE u.name = :name
+        AND u.phoneNumber = :phoneNumber
+    """)
+    Optional<String> findEmailByNameAndPhoneNumber(@Param("name") String name, @Param("phoneNumber") String phoneNumber);
 }

@@ -8,6 +8,7 @@ public enum ExceptionStatus {
 
   // AUTH
   INVALID_USER_LOGIN_INFO(HttpStatus.BAD_REQUEST, 400, "아이디 혹은 비밀번호가 일치하지 않습니다."),
+  INVALID_USER_EMAIL_AUTH(HttpStatus.BAD_REQUEST, 400, "인증되지 않은 이메일입니다."),
 
   // JWT
   UN_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, 401, "토큰 정보가 없습니다."),
