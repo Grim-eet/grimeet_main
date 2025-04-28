@@ -3,6 +3,8 @@ package com.grimeet.grimeet.domain.user.service;
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.image.ProfileImageUtils;
+import com.grimeet.grimeet.common.mail.service.MailService;
+import com.grimeet.grimeet.common.util.user.TempPasswordGenerator;
 import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
@@ -28,12 +30,19 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserLogFacade userLogFacade;
     private final S3ImageService s3ImageService;
+    private final MailService mailService;
+    private final TempPasswordGenerator tempPasswordGenerator; // 임시 비밀번호 생성기
 
-    // email로 유저 찾기
+    /**
+     * 이메일로 사용자 조회
+     * 조회 성공 시 사용자 정보 반환
+     * @param id
+     * @return UserResonseDto(user)
+     */
     @Transactional
     @Override
-    public UserResponseDto findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
+    public UserResponseDto findUserByEmail(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         return new UserResponseDto(user);
     }
@@ -73,19 +82,6 @@ public class UserServiceImpl implements UserService {
             // 알림이나 감지 필요 시 추가
         }
 
-    }
-
-    // 유저 상태 휴면 전환
-    @Transactional
-    @Override
-    public void updateUserStatusDormant(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
-        }
-        User user = optionalUser.get();
-        user.setUserStatus(UserStatus.DORMANT);
     }
 
     // 유저 상태 일반 전환
@@ -170,6 +166,40 @@ public class UserServiceImpl implements UserService {
         user.setProfileImageKey(null);
 
         return new UserResponseDto(user);
+    }
+
+    /**
+     * 기존 사용자의 계정(이메일)을 이름, 전화번호로 찾는다.
+     * @param requestDto
+     * @return email
+     */
+    @Transactional
+    @Override
+    public String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto) {
+        return userRepository.findEmailByNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+    }
+
+    /**
+     * 사용자 비밀번호 찾기
+     * 임시 비밀번호를 사용자 이메일로 발급하여 전송한다.
+     * 임시 비밀번호는 사용자 비밀번호로 저장된다.
+     * @param requestDto
+     */
+    @Transactional
+    @Override
+    public void findUserPasswordByEmail(UserFindPasswordRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+
+        // 임시 비밀빈호 발급
+        String tempPassword = tempPasswordGenerator.generate();
+        // 사용자 비밀번호 변경
+        user.setPassword(passwordEncoder.encode(tempPassword));
+        userLogFacade.updatePasswordLog(user.getId());
+
+        // 이메일 발송
+        mailService.sendEmail(user.getEmail(), "[Grimeet] 임시 비밀번호 발급", "[임시 비밀번호] " + tempPassword);
     }
 
     private void verifyCurrentPasswordMatches(String rawPassword, String encodedPassword) {

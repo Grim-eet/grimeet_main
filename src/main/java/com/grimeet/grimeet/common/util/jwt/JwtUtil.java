@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.common.jwt;
+package com.grimeet.grimeet.common.util.jwt;
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import io.jsonwebtoken.*;

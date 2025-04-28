@@ -7,13 +7,10 @@ import java.util.List;
 public interface UserService {
 
     // email로 유저 찾기
-    UserResponseDto findUserByEmail(String email);
+    UserResponseDto findUserByEmail(Long id);
 
     // 탈퇴 회원으로 전환
     void updateUserStatusWithdrawal(String email);
-
-    // 휴면 회원으로 전환
-    void updateUserStatusDormant(String email);
 
     // 스케줄러 -> 휴면 회원들로 전환
     void updateUserStatusDormantBatch(List<Long> ids);
@@ -33,4 +30,9 @@ public interface UserService {
     // 유저 프로필 이미지 삭제
     UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto);
 
+    // 유저 아이디(이메일) 찾기
+    String findUserEmailByNameAndPhoneNumber(UserFindEmailRequestDto requestDto);
+
+    // 유저 비밀번호 찾기
+    void findUserPasswordByEmail(UserFindPasswordRequestDto requestDto);
 }
