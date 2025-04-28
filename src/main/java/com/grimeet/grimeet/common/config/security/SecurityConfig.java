@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.common.config.security;
 
+import com.grimeet.grimeet.common.config.oauth.handler.OAuth2AuthenticationFailureHandler;
+import com.grimeet.grimeet.common.config.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.grimeet.grimeet.common.filter.TokenAuthenticationFilter;
 import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
@@ -26,7 +28,8 @@ public class SecurityConfig {
   private final CorsConfig corsConfig;
   private final RefreshTokenRepository refreshTokenRepository;
   private final JwtUtil jwtUtil;
-  public static final String ACCESS_TOKEN_COOKIE_NAME = "Authorization_Access";
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
   /**
    * AuthenticationManager 빈 등록
@@ -64,6 +67,9 @@ public class SecurityConfig {
                             .anyRequest().authenticated()
             )
             .formLogin(AbstractHttpConfigurer::disable)
+            .oauth2Login(oauth2 -> oauth2
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureHandler(oAuth2AuthenticationFailureHandler))
             .logout(logout -> logout
                     .logoutUrl("/auth/logout")
                     .logoutSuccessHandler((request, response, authentication) -> {
@@ -87,9 +93,6 @@ public class SecurityConfig {
                         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                       } catch (Exception e) {
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                      } finally {
-                        // 쿠키 삭제
-                        removeCookie(response);
                       }
                     })
 
@@ -97,15 +100,5 @@ public class SecurityConfig {
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  private static void removeCookie(HttpServletResponse response) {
-    Cookie cookie = new Cookie(ACCESS_TOKEN_COOKIE_NAME, null);
-    cookie.setMaxAge(0);
-    cookie.setPath("/");
-    cookie.setHttpOnly(true);
-    cookie.setSecure(false);
-//    cookie.setDomain("grimeet.com");
-    response.addCookie(cookie);
   }
 }

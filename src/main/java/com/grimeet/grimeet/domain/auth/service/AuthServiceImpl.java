@@ -66,6 +66,23 @@ public class AuthServiceImpl implements AuthService {
     }
   }
 
+  @Override
+  @Transactional
+  public TokenRefreshResponseDto createAccessTokenByHeader(String authorizationHeader) {
+    String refreshToken = extractToken(authorizationHeader);
+    return createAccessToken(refreshToken);
+  }
+
+  /**
+   * Authorization 헤더에서 Bearer 토큰 추출
+   */
+  private String extractToken(String authorizationHeader) {
+    if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+      return authorizationHeader.substring("Bearer ".length());
+    }
+    throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
+  }
+
   /**
    * AccessToken을 생성하는 메서드
    * @param refreshToken
@@ -74,20 +91,20 @@ public class AuthServiceImpl implements AuthService {
   @Override
   @Transactional
   public TokenRefreshResponseDto createAccessToken(String refreshToken) {
-    if(!jwtUtil.validateRefreshToken(refreshToken)) {
+    jwtUtil.validateRefreshToken(refreshToken);
+
+    String username = jwtUtil.getUsernameFromRefreshToken(refreshToken);
+    RefreshToken storedToken = findRefreshToken(username);
+
+    if (!storedToken.getToken().equals(refreshToken)) {
       throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
     }
 
-    String findUsername = jwtUtil.getUsernameFromRefreshToken(refreshToken);
-    RefreshToken findRefreshToken = verifyExistRefreshTokenByUsername(findUsername);
+    UserDetails userDetails = userDetailService.loadUserByUsername(username);
+    validateUserDetails(userDetails);
 
-
-    UserDetails findUserDetail = userDetailService.loadUserByUsername(findUsername);
-    verifyExistUserToUseUserDetail(findUserDetail);
-
-    String newAccessToken = jwtUtil.generateAccessToken((UserPrincipalDetails) findUserDetail);
-
-    String newRefreshToken = rotateRefreshToken(findUserDetail, findRefreshToken);
+    String newAccessToken = jwtUtil.generateAccessToken((UserPrincipalDetails) userDetails);
+    String newRefreshToken = rotateRefreshToken(userDetails, storedToken);
 
     return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
   }
@@ -154,9 +171,14 @@ public class AuthServiceImpl implements AuthService {
     });
   }
 
-  private RefreshToken verifyExistRefreshTokenByUsername(String findUsername) {
-    return refreshTokenRepository.findByEmail(findUsername).orElseThrow(() -> {
-      throw new GrimeetException(ExceptionStatus.INVALID_TOKEN);
-    });
+  private RefreshToken findRefreshToken(String username) {
+    return refreshTokenRepository.findByEmail(username)
+            .orElseThrow(() -> new GrimeetException(ExceptionStatus.UN_AUTHENTICATION_TOKEN));
+  }
+
+  private void validateUserDetails(UserDetails userDetails) {
+    if (userDetails == null) {
+      throw new GrimeetException(ExceptionStatus.USER_NOT_FOUND);
+    }
   }
 }

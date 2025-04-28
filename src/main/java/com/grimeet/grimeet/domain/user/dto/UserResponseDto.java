@@ -46,15 +46,15 @@ public class UserResponseDto {
         this.userStatus = user.getUserStatus();
     }
 
-    public User toEntity(UserResponseDto userResponseDto) {
+    public User toEntity() {
         return User.builder()
-                .id(userResponseDto.getId())
-                .name(userResponseDto.getName())
-                .email(userResponseDto.getEmail())
-                .nickname(userResponseDto.getNickname())
-                .phoneNumber(userResponseDto.getPhoneNumber())
-                .profileImageUrl(userResponseDto.getProfileImageUrl())
-                .userStatus(userResponseDto.getUserStatus())
+                .id(this.id)
+                .name(this.name)
+                .email(this.email)
+                .nickname(this.nickname)
+                .phoneNumber(this.phoneNumber)
+                .profileImageUrl(this.profileImageUrl)
+                .userStatus(this.userStatus)
                 .build();
     }
 }

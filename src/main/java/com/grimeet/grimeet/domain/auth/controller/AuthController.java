@@ -6,7 +6,6 @@ import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.UserLoginRequestDto;
 import com.grimeet.grimeet.domain.auth.service.AuthService;
 import com.grimeet.grimeet.domain.user.dto.UserCreateRequestDto;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
   private final AuthService authService;
-  @Value("${cookie.max-age.access}")
-  private int cookieMaxAge;
+  private static final String HEADER_AUTH = "Authorization";
+  private static final String TOKEN_TYPE = "Bearer ";
+
 
   @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
   @ApiResponses({
@@ -49,20 +48,13 @@ public class AuthController {
   public ResponseEntity<AuthLoginResponseDto> login(@Valid @RequestBody UserLoginRequestDto userLoginRequestDto, HttpServletResponse response) {
     AuthResponseDto tokenDto = authService.login(userLoginRequestDto);
 
-    Cookie cookie = new Cookie("Authorization_Access", tokenDto.getAccessToken());
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(cookieMaxAge);
-    response.addCookie(cookie);
-
-    // AccessToken은 쿠키로 보내고, RefreshToken은 body로 응답
-    // 이유는 AccessToken은 클라이언트에서 자주 사용되므로 쿠키에 저장하고, RefreshToken은 서버에서 관리하기 위함
-    return ResponseEntity.ok(AuthLoginResponseDto.builder()
-            .refreshToken(tokenDto.getRefreshToken())
-            .isPasswordChangeRequired(tokenDto.getIsPasswordChangeRequired())
-            .isDormant(tokenDto.getIsDormant())
-            .build());
+    return ResponseEntity.ok()
+            .header(HEADER_AUTH, TOKEN_TYPE + tokenDto.getAccessToken())
+            .body(AuthLoginResponseDto.builder()
+                    .refreshToken(tokenDto.getRefreshToken())
+                    .isPasswordChangeRequired(tokenDto.getIsPasswordChangeRequired())
+                    .isDormant(tokenDto.getIsDormant())
+                    .build());
   }
 
   @Operation(summary = "로그아웃", description = "AccessToken 쿠키를 삭제하고 RefreshToken을 무효화합니다.")
@@ -85,9 +77,17 @@ public class AuthController {
   })
   @PostMapping("/refresh")
   public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
-          @RequestHeader("Authorization_Refresh") String refreshToken
+          @RequestHeader("Authorization") String authorizationHeader
   ) {
+    String refreshToken = extractToken(authorizationHeader); // "Bearer " 제거
     TokenRefreshResponseDto response = authService.createAccessToken(refreshToken);
     return ResponseEntity.ok(response);
+  }
+
+  private String extractToken(String tokenHeader) {
+    if (tokenHeader != null && tokenHeader.startsWith("Bearer ")) {
+      return tokenHeader.substring("Bearer ".length());
+    }
+    throw new IllegalArgumentException("잘못된 Authorization 헤더 형식입니다.");
   }
 }

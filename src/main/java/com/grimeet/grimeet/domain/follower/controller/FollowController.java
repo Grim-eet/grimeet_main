@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.follower.controller;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.follower.dto.FollowRequestDto;
 import com.grimeet.grimeet.domain.follower.dto.UserSummaryResponseDto;
 import com.grimeet.grimeet.domain.follower.service.FollowService;
@@ -57,6 +59,9 @@ public class FollowController {
           @AuthenticationPrincipal UserPrincipalDetails userDetails,
           @RequestParam Long followingId
   ) {
+    if (userDetails == null) {
+      throw new GrimeetException(ExceptionStatus.UNAUTHORIZED_USER);
+    }
     Long followerId = userDetails.getUser().getId();
     boolean result = followService.isFollowing(followerId, followingId);
     return ResponseEntity.ok(result);

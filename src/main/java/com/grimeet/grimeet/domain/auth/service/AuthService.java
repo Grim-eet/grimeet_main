@@ -13,5 +13,5 @@ public interface AuthService {
 
   AuthResponseDto login(UserLoginRequestDto userLoginRequestDto);
 
-//  void logout(String userEmail);
+  TokenRefreshResponseDto createAccessTokenByHeader(String authorizationHeader);
 }
