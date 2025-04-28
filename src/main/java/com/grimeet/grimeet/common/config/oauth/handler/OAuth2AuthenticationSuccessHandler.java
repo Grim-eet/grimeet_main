@@ -3,7 +3,7 @@ package com.grimeet.grimeet.common.config.oauth.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.common.jwt.JwtUtil;
+import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
 import com.grimeet.grimeet.domain.auth.repository.RefreshTokenRepository;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
