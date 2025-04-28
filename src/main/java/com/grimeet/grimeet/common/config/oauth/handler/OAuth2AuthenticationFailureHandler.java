@@ -11,18 +11,15 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper;
 
   @Override
   public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -32,7 +29,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
     response.setContentType("application/json;charset=UTF-8");
 
     // 에러 메시지 구성
-    Map<String, String> errorResponse = new ConcurrentHashMap<>();
+    Map<String, String> errorResponse = new HashMap<>();
     String errorCode = "OAUTH2_AUTHENTICATION_FAILED";
 
     if (exception.getMessage().contains("redirect_uri")) {
