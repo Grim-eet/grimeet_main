@@ -41,7 +41,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "webp", "heic");
     private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
-            "image/jpeg", "image/png", "image/heic", "image/webp"
+            "image/jpg", "image/jpeg", "image/png", "image/heic", "image/webp"
     );
 
     /**
@@ -100,11 +100,17 @@ public class S3ImageServiceImpl implements S3ImageService {
         String originalFileName = image.getOriginalFilename();
         String extension = getExtension(originalFileName);
 
-        try (ByteArrayInputStream webpInputStream =
-                     extension.equals("heic")
-                     ? convertHeicToWebp(image)
-                     : webpImageConverter.convertToWebp(image)) {
+        ByteArrayInputStream webpInputStream;
 
+        if ("webp".equalsIgnoreCase(extension)) {
+            webpInputStream = new ByteArrayInputStream(image.getBytes());
+        } else if ("heic".equalsIgnoreCase(extension)) {
+            webpInputStream = convertHeicToWebp(image);
+        } else {
+            webpInputStream = webpImageConverter.convertToWebp(image.getInputStream());
+        }
+
+        try (webpInputStream) {
             // 고유한 S3 파일 이름 생성 : 타임 스탬프 + 확장자 webp
             String todayPath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
             String radonPrefix = UUID.randomUUID().toString().substring(0, 2);
