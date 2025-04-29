@@ -66,6 +66,12 @@ dependencies {
 
 	// Mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // STOMP
+    implementation 'org.springframework.messaging:spring-messaging'
 }
 
 tasks.named('test') {
