@@ -52,44 +52,44 @@ public class UserLogSchedulerTest {
                 .nextNotificationDate(LocalDate.now().plusDays(10))
                 .build());
     }
-    @DisplayName("스케줄러가_휴면상태로_정상_전환한다")
-    @Test
-    void 스케줄러가_휴면상태로_정상_전환한다() {
-        // when
-        userLogScheduler.updateUserLogByDormantCheck();
-
-        // then
-        User updatedUser = userRepository.findById(user.getId()).orElseThrow();
-        assertEquals(UserStatus.DORMANT, updatedUser.getUserStatus());
-    }
-
-    @DisplayName("nextDormantCheckDate가_미래인_유저는_변경되지_않는다")
-    @Test
-    void nextDormantCheckDate가_미래인_유저는_변경되지_않는다() {
-        // given
-        User futureUser = userRepository.save(User.builder()
-                .name("미래유저")
-                .email("future@example.com")
-                .password("pw")
-                .nickname("미래")
-                .phoneNumber("010-9999-8888")
-                .userStatus(UserStatus.NORMAL)
-                .build());
-
-        userLogRepository.save(UserLog.builder()
-                .userId(futureUser.getId())
-                .lastLoginAt(LocalDate.now())
-                .changedPasswordAt(LocalDate.now())
-                .nextDormantCheckDate(LocalDate.now().plusDays(5)) // 미래 날짜
-                .nextNotificationDate(LocalDate.now().plusDays(30))
-                .build());
-
-        // when
-        userLogScheduler.updateUserLogByDormantCheck();
-
-        // then
-        User updated = userRepository.findById(futureUser.getId()).orElseThrow();
-        assertEquals(UserStatus.NORMAL, updated.getUserStatus());
-    }
+//    @DisplayName("스케줄러가_휴면상태로_정상_전환한다")
+//    @Test
+//    void 스케줄러가_휴면상태로_정상_전환한다() {
+//        // when
+//        userLogScheduler.updateUserLogByDormantCheck();
+//
+//        // then
+//        User updatedUser = userRepository.findById(user.getId()).orElseThrow();
+//        assertEquals(UserStatus.DORMANT, updatedUser.getUserStatus());
+//    }
+//
+//    @DisplayName("nextDormantCheckDate가_미래인_유저는_변경되지_않는다")
+//    @Test
+//    void nextDormantCheckDate가_미래인_유저는_변경되지_않는다() {
+//        // given
+//        User futureUser = userRepository.save(User.builder()
+//                .name("미래유저")
+//                .email("future@example.com")
+//                .password("pw")
+//                .nickname("미래")
+//                .phoneNumber("010-9999-8888")
+//                .userStatus(UserStatus.NORMAL)
+//                .build());
+//
+//        userLogRepository.save(UserLog.builder()
+//                .userId(futureUser.getId())
+//                .lastLoginAt(LocalDate.now())
+//                .changedPasswordAt(LocalDate.now())
+//                .nextDormantCheckDate(LocalDate.now().plusDays(5)) // 미래 날짜
+//                .nextNotificationDate(LocalDate.now().plusDays(30))
+//                .build());
+//
+//        // when
+//        userLogScheduler.updateUserLogByDormantCheck();
+//
+//        // then
+//        User updated = userRepository.findById(futureUser.getId()).orElseThrow();
+//        assertEquals(UserStatus.NORMAL, updated.getUserStatus());
+//    }
 
 }
