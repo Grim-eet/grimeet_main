@@ -106,9 +106,12 @@ public class S3ImageServiceImpl implements S3ImageService {
                      : webpImageConverter.convertToWebp(image)) {
 
             // 고유한 S3 파일 이름 생성 : 타임 스탬프 + 확장자 webp
+            String todayPath = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+            String radonPrefix = UUID.randomUUID().toString().substring(0, 2);
             String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
             String randomSuffix = UUID.randomUUID().toString().substring(0, 5);
-            String s3FileName = "profile/" + timestamp + "_" + randomSuffix + ".webp";
+            String s3FileName = "profile/" + todayPath + "/" + radonPrefix + "/"
+                    + timestamp + "_" + randomSuffix + ".webp";
 
             // 확장자 변환
             ObjectMetadata metadata = new ObjectMetadata();
