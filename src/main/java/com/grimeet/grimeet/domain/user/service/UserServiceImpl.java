@@ -146,7 +146,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         MultipartFile image = requestDto.getImage();
 
-        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+        if (user.getProfileImageKey() != null) {
+            s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+        }
 
         ImageUploadResult imageUploadResult = s3ImageService.upload(image);
 

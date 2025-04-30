@@ -44,16 +44,16 @@ public class HeicToJpegConverter {
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
 
-            if (exitCode != 0) {
-                throw new IOException("변환 실패");
+            if (exitCode != 0 || !tempJpegFile.exists()) {
+                log.error("[HeicToJpegConverter] 변환 실패 (exitCode: {}, jpeg 존재 여부: {})", exitCode, tempJpegFile.exists());
+                throw new IOException("HEIC → JPEG 변환 실패 (exitCode: " + exitCode + ")");
             }
 
             return tempJpegFile;
         } catch (IOException | InterruptedException e ) {
-            log.warn("[HeicToJpegConverter] heic 파일 변환 실패: {}", tempHeicFile.getAbsolutePath());
+            log.warn("[HeicToJpegConverter] heic 파일 변환 중 예외 발생: {}", e.getMessage(), e);
             throw e;
-        }
-        finally {
+        } finally {
             if (tempHeicFile.exists()) tempHeicFile.delete();
         }
     }

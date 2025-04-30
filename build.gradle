@@ -60,9 +60,10 @@ dependencies {
 	// upload
 	// AWS S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	// Twelvemonkeys imageio
-	implementation 'com.twelvemonkeys.imageio:imageio-core:3.8.1'  // 필수 (기본 엔진)
-	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.8.1'  // 필수 (webp 변환)
+	// Twelvemonkeys imageio - 엔진, 확장자 변환
+	implementation 'com.twelvemonkeys.imageio:imageio-core:3.11.0'
+	// WebP 읽기 지원
+	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.11.0'
 
 	// Cache
 	// Redis
