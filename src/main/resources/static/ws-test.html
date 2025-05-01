@@ -16,15 +16,23 @@
     let stompClient = null;
 
     function connect() {
+        const token = localStorage.getItem('access_token');
         const socket = new SockJS('http://localhost:8081/api/ws');
         stompClient = Stomp.over(socket);
-        stompClient.connect({}, function (frame) {
-            console.log('Connected: ' + frame);
-            stompClient.subscribe('/topic/greetings', function (greeting) {
-                document.getElementById('messages').innerHTML += '<div>' + greeting.body + '</div>';
-            });
-        });
+
+        // JWT를 헤더에 담아서 보냄
+        stompClient.connect(
+            { 'Authorization': 'Bearer ' + token },
+            function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/greetings', function (greeting) {
+                    document.getElementById('messages').innerHTML += '<div>' + greeting.body + '</div>';
+                });
+            }
+        );
     }
+
+
 
     function sendMessage() {
         stompClient.send("/app/hello", {}, "그리밋!");
