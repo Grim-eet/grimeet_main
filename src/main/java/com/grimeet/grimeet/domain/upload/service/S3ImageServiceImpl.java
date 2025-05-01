@@ -39,7 +39,7 @@ public class S3ImageServiceImpl implements S3ImageService {
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName;
 
-    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "webp", "heic");
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "webp", "heic", "heif");
     private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
             "image/jpg", "image/jpeg", "image/png", "image/heic", "image/webp"
     );
@@ -104,7 +104,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         if ("webp".equalsIgnoreCase(extension)) {
             webpInputStream = new ByteArrayInputStream(image.getBytes());
-        } else if ("heic".equalsIgnoreCase(extension)) {
+        } else if ("heic".equalsIgnoreCase(extension) || "heif".equalsIgnoreCase(extension)) {
             webpInputStream = convertHeicToWebp(image);
         } else {
             webpInputStream = webpImageConverter.convertToWebp(image.getInputStream());
