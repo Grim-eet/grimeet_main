@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-@Tag(name="Mail", description = "인증용 이메일 송수신 API")
+@Tag(name = "mail_auth", description = "이메일 인증과 관련된 API")
 public class MailAuthController {
 
     private final EmailVerificationService authVerificationService;
@@ -31,7 +31,7 @@ public class MailAuthController {
     @PostMapping("/email-code")
     public ResponseEntity<String> sendVerificationCode(@Valid @RequestBody SendAuthCodeRequestDto requestDto) {
         authVerificationService.sendVerificationCode(requestDto.getEmail());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("이메일을 발송하였습니다.");
     }
 
     @Operation(summary = "이메일 인증 코드 확인", description = "입력한 인증 코드가 유효한지 검증합니다.")
@@ -43,8 +43,8 @@ public class MailAuthController {
     public ResponseEntity<String> verifyAuthCode(@Valid @RequestBody VerifyAuthCodeRequestDto requestDto) {
         boolean isVerified = authVerificationService.verifyCode(requestDto.getEmail(), requestDto.getCode());
         return isVerified ?
-                ResponseEntity.ok().build() :
-                ResponseEntity.badRequest().build();
+                ResponseEntity.ok().body("이메일 인증에 성공했습니다.") :
+                ResponseEntity.badRequest().body("이메일 인증에 실패했습니다.");
     }
 
 }
