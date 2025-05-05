@@ -1,19 +1,21 @@
 package com.grimeet.grimeet.domain.user.controller;
 
 
+import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.service.UserService;
+import com.sun.security.auth.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/user")
@@ -101,8 +103,8 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
     })
     @DeleteMapping("/update/profile-image")
-    public ResponseEntity<UserResponseDto> deleteUserProfileImage(@Valid @RequestBody UserDeleteProfileImageRequestDto requestDto) {
-        UserResponseDto responseDto = userService.deleteUserProfileImage(requestDto);
+    public ResponseEntity<UserResponseDto> deleteUserProfileImage(@AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+        UserResponseDto responseDto = userService.deleteUserProfileImage(userPrincipal.getId());
         return ResponseEntity.ok(responseDto);
     }
 }

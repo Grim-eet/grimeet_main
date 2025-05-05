@@ -161,8 +161,8 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 삭제
     @Transactional
     @Override
-    public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto deleteUserProfileImage(Long id) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         s3ImageService.deleteImageFromS3(user.getProfileImageKey());
