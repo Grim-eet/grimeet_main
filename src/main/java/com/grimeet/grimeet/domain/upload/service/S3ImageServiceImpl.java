@@ -20,6 +20,7 @@ import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.image.HeicToJpegConverter;
 import com.grimeet.grimeet.common.image.WebpImageConverter;
+import com.grimeet.grimeet.domain.upload.constant.ImageFileType;
 import com.grimeet.grimeet.domain.upload.dto.ImageUploadResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +39,6 @@ public class S3ImageServiceImpl implements S3ImageService {
 
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName;
-
-    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "webp", "heic", "heif");
-    private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
-            "image/jpg", "image/jpeg", "image/png", "image/heic", "image/webp"
-    );
 
     /**
      * AWS S3에 이미지 업로드 실행 로직
@@ -147,7 +143,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         String extension = fileName.substring(lastDotIndex + 1).toLowerCase();
 
-        if (!ALLOWED_EXTENSIONS.contains(extension)) {
+        if (!ImageFileType.isAllowedExtension(extension)) {
             log.error("허용되지 않은 확장자: {}", extension);
             throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
@@ -155,7 +151,7 @@ public class S3ImageServiceImpl implements S3ImageService {
 
     // contentType 검증
     private void validateContentType(String contentType) {
-        if (contentType == null || !ALLOWED_CONTENT_TYPES.contains(contentType)) {
+        if (contentType == null || !ImageFileType.isAllowedContentType(contentType)) {
             log.error("허용되지 않은 contentType: {}", contentType);
             throw new GrimeetException(ExceptionStatus.INVALID_FILE);
         }
