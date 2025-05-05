@@ -141,9 +141,7 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 변경
     @Transactional
     @Override
-    public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
-                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
+    public UserResponseDto updateUserProfileImage(User user, UserUpdateProfileImageRequestDto requestDto) {
         MultipartFile image = requestDto.getImage();
 
         if (user.getProfileImageKey() != null) {
@@ -161,8 +159,8 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 삭제
     @Transactional
     @Override
-    public UserResponseDto deleteUserProfileImage(Long id) {
-        User user = userRepository.findById(id)
+    public UserResponseDto deleteUserProfileImage(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         s3ImageService.deleteImageFromS3(user.getProfileImageKey());

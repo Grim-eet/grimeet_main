@@ -16,10 +16,6 @@ public class UserPrincipalDetails implements UserDetails {
     private User user;
     private List<GrantedAuthority> authorities;
 
-    public Long getId() {
-        return user.getId();
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;

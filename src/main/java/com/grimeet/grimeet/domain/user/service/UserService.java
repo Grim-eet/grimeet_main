@@ -1,6 +1,7 @@
 package com.grimeet.grimeet.domain.user.service;
 
 import com.grimeet.grimeet.domain.user.dto.*;
+import com.grimeet.grimeet.domain.user.entity.User;
 
 import java.util.List;
 
@@ -28,9 +29,9 @@ public interface UserService {
     UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 
     // 유저 프로필 이미지 변경
-    UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto);
+    UserResponseDto updateUserProfileImage(User user, UserUpdateProfileImageRequestDto requestDto);
 
     // 유저 프로필 이미지 삭제
-    UserResponseDto deleteUserProfileImage(Long id);
+    UserResponseDto deleteUserProfileImage(String email);
 
 }
