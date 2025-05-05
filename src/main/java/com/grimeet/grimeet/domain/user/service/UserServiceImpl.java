@@ -36,13 +36,13 @@ public class UserServiceImpl implements UserService {
     /**
      * 이메일로 사용자 조회
      * 조회 성공 시 사용자 정보 반환
-     * @param id
+     * @param email
      * @return UserResonseDto(user)
      */
     @Transactional
     @Override
-    public UserResponseDto findUserByEmail(Long id) {
-        User user = userRepository.findById(id)
+    public UserResponseDto findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         return new UserResponseDto(user);
     }
@@ -58,30 +58,6 @@ public class UserServiceImpl implements UserService {
         }
         User user = optionalUser.get();
         user.setUserStatus(UserStatus.WITHDRAWAL);
-    }
-
-    @Transactional
-    @Override
-    public void updateUserStatusDormantBatch(List<Long> ids) {
-        try {
-            List<User> users = userRepository.findByIdInAndUserStatusIn(ids, List.of(UserStatus.NORMAL, UserStatus.SOCIAL));  // 한번에 조회
-
-            // 일반, 소셜 회원만 조회 -> 휴면 전환
-            int successCount = 0;
-
-            for (User user : users) {
-                if (user.getUserStatus() == UserStatus.NORMAL || user.getUserStatus() == UserStatus.SOCIAL) {
-                    user.setUserStatus(UserStatus.DORMANT);
-                    successCount++;
-                }
-            }
-
-            log.info("[UserService] 휴면 처리 완료 → 조회: 총 {}, 휴면 전환 성공: {}", users.size(), successCount);
-        } catch (Exception e) {
-            log.info("[UserService] 휴면 상태 일괄 전환 중 예외 발생: {}", e.getMessage());
-            // 알림이나 감지 필요 시 추가
-        }
-
     }
 
     // 유저 상태 일반 전환
@@ -100,8 +76,8 @@ public class UserServiceImpl implements UserService {
     // 유저 정보 업데이트
     @Transactional
     @Override
-    public UserResponseDto updateUserInfo(UserUpdateRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto updateUserInfo(String email, UserUpdateRequestDto requestDto) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         // 닉네임 변경
@@ -122,8 +98,8 @@ public class UserServiceImpl implements UserService {
     // 유저 비밀번호 업데이트
     @Transactional
     @Override
-    public UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto updateUserPassword(String email, UserUpdatePasswordRequestDto requestDto) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         verifyCurrentPasswordMatches(requestDto.getCurrentPassword(), user.getPassword());
@@ -137,12 +113,14 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 변경
     @Transactional
     @Override
-    public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto updateUserProfileImage(String email, UserUpdateProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         MultipartFile image = requestDto.getImage();
 
-        s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+        if (user.getProfileImageKey() != null) {
+            s3ImageService.deleteImageFromS3(user.getProfileImageKey());
+        }
 
         ImageUploadResult imageUploadResult = s3ImageService.upload(image);
 
@@ -155,8 +133,8 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 삭제
     @Transactional
     @Override
-    public UserResponseDto deleteUserProfileImage(UserDeleteProfileImageRequestDto requestDto) {
-        User user = userRepository.findByEmail(requestDto.getEmail())
+    public UserResponseDto deleteUserProfileImage(String email) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
 
         s3ImageService.deleteImageFromS3(user.getProfileImageKey());

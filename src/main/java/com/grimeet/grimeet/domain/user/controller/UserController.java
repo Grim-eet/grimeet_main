@@ -2,8 +2,6 @@ package com.grimeet.grimeet.domain.user.controller;
 
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
-import com.grimeet.grimeet.common.exception.ExceptionStatus;
-import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,29 +23,16 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "사용자 정보 조회", description = "사용자의 정보 조회")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사용자 정보 조회 성공", content = @Content),
-            @ApiResponse(responseCode = "403", description = "접근할 수 없습니다.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "일치하는 유저를 찾을 수 없습니다.", content = @Content),
-    })
-    @GetMapping("/get/user-info")
-    public ResponseEntity<UserResponseDto> getUserInfo(@AuthenticationPrincipal UserPrincipalDetails userDetails) {
-        if (userDetails == null) {
-            throw new GrimeetException(ExceptionStatus.INVALID_ROLE);
-        }
-        UserResponseDto responseDto = userService.findUserByEmail(userDetails.getUser().getId());
-        return ResponseEntity.ok(responseDto);
-    }
-
     @Operation(summary = "탈퇴 회원으로 전환", description = "사용자 상태를 'WITHDRAWAL'로 변경합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "상태 변경 완료", content = @Content),
             @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
     })
     @PatchMapping("/update/userStatus/withdrawal")
-    public ResponseEntity<UserResponseDto> updateUserStatusWithdrawal(@Valid @RequestBody UserUpdateStatusRequestDto requestDto) {
-        userService.updateUserStatusWithdrawal(requestDto.getEmail());
+    public ResponseEntity<UserResponseDto> updateUserStatusWithdrawal(
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        userService.updateUserStatusWithdrawal(userPrincipal.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -69,8 +54,11 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
     })
     @PatchMapping("/update")
-    public ResponseEntity<UserResponseDto> updateUserInfo(@Valid @RequestBody UserUpdateRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserInfo(requestDto);
+    public ResponseEntity<UserResponseDto> updateUserInfo(
+            @Valid @RequestBody UserUpdateRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.updateUserInfo(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -82,8 +70,11 @@ public class UserController {
 
     })
     @PatchMapping("/update/password")
-    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdatePasswordRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserPassword(requestDto);
+    public ResponseEntity<UserResponseDto> updateUserPassword(
+            @Valid @RequestBody UserUpdatePasswordRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.updateUserPassword(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -94,20 +85,24 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
     })
     @PatchMapping("/update/profile-image")
-    public ResponseEntity<UserResponseDto> updateUserProfileImage(@Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserProfileImage(requestDto);
+    public ResponseEntity<UserResponseDto> updateUserProfileImage(
+            @Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.updateUserProfileImage(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "프로필 이미지 수정", description = "기존 이미지를 삭제하고 새 이미지를 등록합니다.")
+    @Operation(summary = "프로필 이미지 삭제", description = "기존 이미지를 삭제하고 기본 이미지로 설정합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "프로필 이미지 변경 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식 또는 이미지 파일"),
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 삭제 성공"),
             @ApiResponse(responseCode = "404", description = "해당 유저를 찾을 수 없음")
     })
     @DeleteMapping("/update/profile-image")
-    public ResponseEntity<UserResponseDto> deleteUserProfileImage(@Valid @RequestBody UserDeleteProfileImageRequestDto requestDto) {
-        UserResponseDto responseDto = userService.deleteUserProfileImage(requestDto);
+    public ResponseEntity<UserResponseDto> deleteUserProfileImage(
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.deleteUserProfileImage(userPrincipal.getUsername());
         return ResponseEntity.ok(responseDto);
     }
 
