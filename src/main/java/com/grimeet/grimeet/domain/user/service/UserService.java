@@ -29,7 +29,7 @@ public interface UserService {
     UserResponseDto updateUserPassword(UserUpdatePasswordRequestDto requestDto);
 
     // 유저 프로필 이미지 변경
-    UserResponseDto updateUserProfileImage(User user, UserUpdateProfileImageRequestDto requestDto);
+    UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto);
 
     // 유저 프로필 이미지 삭제
     UserResponseDto deleteUserProfileImage(String email);

@@ -93,11 +93,9 @@ public class UserController {
     })
     @PatchMapping("/update/profile-image")
     public ResponseEntity<UserResponseDto> updateUserProfileImage(
-            @Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto,
-            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+            @Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto) {
 
-        User user = userPrincipal.getUser();
-        UserResponseDto responseDto = userService.updateUserProfileImage(user, requestDto);
+        UserResponseDto responseDto = userService.updateUserProfileImage(requestDto);
         return ResponseEntity.ok(responseDto);
     }
 

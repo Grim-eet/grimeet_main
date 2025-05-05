@@ -141,7 +141,9 @@ public class UserServiceImpl implements UserService {
     // 유저 프로필 이미지 변경
     @Transactional
     @Override
-    public UserResponseDto updateUserProfileImage(User user, UserUpdateProfileImageRequestDto requestDto) {
+    public UserResponseDto updateUserProfileImage(UserUpdateProfileImageRequestDto requestDto) {
+        User user = userRepository.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new GrimeetException(ExceptionStatus.USER_NOT_FOUND));
         MultipartFile image = requestDto.getImage();
 
         if (user.getProfileImageKey() != null) {
