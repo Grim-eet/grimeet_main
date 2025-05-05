@@ -42,10 +42,11 @@ public class WebpImageConverter {
         File outputWebpFile = new File(TEMP_DIR, outputName);
 
         ProcessBuilder pb = new ProcessBuilder(
-                "cwebp",
-                "-q", "80",    // (품질 조정 옵션) 80% 퀄리티
+                WebpConverterConstants.CWEBP_COMMAND,
+                WebpConverterConstants.QUALITY_OPTION,
+                WebpConverterConstants.QUALITY_VALUE,
                 inputFile.getAbsolutePath(),
-                "-o",
+                WebpConverterConstants.OUTPUT_OPTION,
                 outputWebpFile.getAbsolutePath()
         );
 
