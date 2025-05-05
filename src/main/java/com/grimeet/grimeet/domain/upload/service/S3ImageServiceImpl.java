@@ -98,12 +98,17 @@ public class S3ImageServiceImpl implements S3ImageService {
 
         ByteArrayInputStream webpInputStream;
 
-        if ("webp".equalsIgnoreCase(extension)) {
-            webpInputStream = new ByteArrayInputStream(image.getBytes());
-        } else if ("heic".equalsIgnoreCase(extension) || "heif".equalsIgnoreCase(extension)) {
-            webpInputStream = convertHeicToWebp(image);
-        } else {
-            webpInputStream = webpImageConverter.convertToWebp(image.getInputStream());
+        switch (extension) {
+            case "webp":
+                webpInputStream = new ByteArrayInputStream(image.getBytes());
+                break;
+            case "heic":
+            case "heif":
+                webpInputStream = convertHeicToWebp(image);
+                break;
+            default:
+                webpInputStream = webpImageConverter.convertToWebp(image.getInputStream());
+                break;
         }
 
         try (webpInputStream) {
