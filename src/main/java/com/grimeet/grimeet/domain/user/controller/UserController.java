@@ -3,9 +3,7 @@ package com.grimeet.grimeet.domain.user.controller;
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.user.dto.*;
-import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.service.UserService;
-import com.sun.security.auth.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,20 +30,10 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
     })
     @PatchMapping("/update/userStatus/withdrawal")
-    public ResponseEntity<UserResponseDto> updateUserStatusWithdrawal(@Valid @RequestBody UserUpdateStatusRequestDto requestDto) {
-        userService.updateUserStatusWithdrawal(requestDto.getEmail());
-        return ResponseEntity.ok().build();
-    }
+    public ResponseEntity<UserResponseDto> updateUserStatusWithdrawal(
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
 
-
-    @Operation(summary = "휴면 회원으로 전환", description = "사용자 상태를 'DORMANT'로 변경합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "상태 변경 완료", content = @Content),
-            @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
-    })
-    @PatchMapping("/update/userStatus/dormant")
-    public ResponseEntity<UserResponseDto> updateUserStatusDormant(@Valid @RequestBody UserUpdateStatusRequestDto requestDto) {
-        userService.updateUserStatusDormant(requestDto.getEmail());
+        userService.updateUserStatusWithdrawal(userPrincipal.getUsername());
         return ResponseEntity.ok().build();
     }
 
@@ -67,8 +55,11 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "일치하는 유저정보를 찾을 수 없습니다.", content = @Content)
     })
     @PatchMapping("/update")
-    public ResponseEntity<UserResponseDto> updateUserInfo(@Valid @RequestBody UserUpdateRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserInfo(requestDto);
+    public ResponseEntity<UserResponseDto> updateUserInfo(
+            @Valid @RequestBody UserUpdateRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.updateUserInfo(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -80,8 +71,11 @@ public class UserController {
 
     })
     @PatchMapping("/update/password")
-    public ResponseEntity<UserResponseDto> updateUserPassword(@Valid @RequestBody UserUpdatePasswordRequestDto requestDto) {
-        UserResponseDto responseDto = userService.updateUserPassword(requestDto);
+    public ResponseEntity<UserResponseDto> updateUserPassword(
+            @Valid @RequestBody UserUpdatePasswordRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
+
+        UserResponseDto responseDto = userService.updateUserPassword(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -93,9 +87,10 @@ public class UserController {
     })
     @PatchMapping("/update/profile-image")
     public ResponseEntity<UserResponseDto> updateUserProfileImage(
-            @Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto) {
+            @Valid @ModelAttribute UserUpdateProfileImageRequestDto requestDto,
+            @AuthenticationPrincipal UserPrincipalDetails userPrincipal) {
 
-        UserResponseDto responseDto = userService.updateUserProfileImage(requestDto);
+        UserResponseDto responseDto = userService.updateUserProfileImage(userPrincipal.getUsername(), requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
