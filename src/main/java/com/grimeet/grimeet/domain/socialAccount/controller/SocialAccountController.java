@@ -78,3 +78,8 @@ public class SocialAccountController {
     googleAuthService.linkeGoogleAccount(username, code);
   }
 }
+
+@GetMapping("/connect/kakao")
+public Map<String, String> getKakaoConnectUrl() {
+  String kakaoConnectUrl =
+}
