@@ -1,0 +1,19 @@
+# Ignore Gradle build output
+build/
+.gradle/
+
+# Ignore IntelliJ / VSCode / IDE metadata
+.idea/
+*.iml
+.vscode/
+
+# Ignore OS metadata
+.DS_Store
+
+# Ignore git repo metadata
+.git
+.gitignore
+
+# Ignore local env files
+.env
+*.log
