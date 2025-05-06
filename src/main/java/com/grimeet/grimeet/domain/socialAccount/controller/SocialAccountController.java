@@ -2,6 +2,8 @@ package com.grimeet.grimeet.domain.socialAccount.controller;
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.auth.service.GoogleAuthServiceImpl;
+import com.grimeet.grimeet.domain.auth.service.KakaoOAuthServiceImpl;
+import com.grimeet.grimeet.domain.auth.service.NaverOAuthServiceImpl;
 import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountRequestDto;
 import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountResponseDto;
 import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
@@ -25,6 +27,8 @@ public class SocialAccountController {
 
   private final SocialAccountFacade socialAccountFacade;
   private final GoogleAuthServiceImpl googleAuthService;
+  private final KakaoOAuthServiceImpl kakaoOAuthService;
+  private final NaverOAuthServiceImpl naverOAuthService;
 
   @Operation(summary = "소셜 계정 연결", description = "사용자가 소셜 계정을 연결합니다.")
   @ApiResponses(
@@ -60,8 +64,6 @@ public class SocialAccountController {
     return Map.of("url", googleConnectUrl);
   }
 
-
-
   @Operation(summary = "구글 소셜 계정 연동", description = "로그인한 사용자가 구글 계정을 연동합니다.")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "201", description = "구글 소셜 계정 연동 성공"),
@@ -75,11 +77,37 @@ public class SocialAccountController {
           @RequestParam("code") String code
   ) {
     String username = principal.getUsername();
-    googleAuthService.linkeGoogleAccount(username, code);
+    googleAuthService.linkGoogleAccount(username, code);
   }
-}
 
-@GetMapping("/connect/kakao")
-public Map<String, String> getKakaoConnectUrl() {
-  String kakaoConnectUrl =
+  @GetMapping("/connect/kakao")
+  public Map<String, String> getKakaoConnectUrl() {
+    String kakaoConnectUrl = kakaoOAuthService.generateAuthUrl();
+    return Map.of("url", kakaoConnectUrl);
+  }
+
+  @PostMapping("/kakao")
+  public void linkKakaoAccount(
+          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
+          @RequestParam("code") String code
+  ) {
+    String username = principal.getUsername();
+    kakaoOAuthService.linkAccount(username, code);
+  }
+
+  @GetMapping("/connect/naver")
+  public Map<String, String> getNaverConnectUrl() {
+    String naverConnectUrl = naverOAuthService.generateAuthUrl();
+    return Map.of("url", naverConnectUrl);
+  }
+
+  @PostMapping("naver")
+  public void linkNaverAccount(
+          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
+          @RequestParam("code") String code
+  ) {
+    String username = principal.getUsername();
+    naverOAuthService.linkAccount(username, code);
+  }
+
 }

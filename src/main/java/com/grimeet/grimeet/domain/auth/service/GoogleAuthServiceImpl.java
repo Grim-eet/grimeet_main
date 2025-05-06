@@ -32,7 +32,7 @@ public class GoogleAuthServiceImpl {
   @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
   private String redirectUri;
 
-  public void linkeGoogleAccount(String username, String code) {
+  public void linkGoogleAccount(String username, String code) {
     String accessToken = fetchGoogleAccessToken(code);
     GoogleOAuthUserInfo googleUserInfo = fetchGoogleUserInfo(accessToken);
 
