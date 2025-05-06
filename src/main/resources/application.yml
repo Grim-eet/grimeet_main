@@ -5,27 +5,32 @@ spring:
     include: oauth
   jackson:
     time-zone: Asia/Seoul
+
   datasource:
-    url: jdbc:mysql://127.0.0.1:3307/grim?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://mysql:3306/grim?serverTimezone=UTC&characterEncoding=UTF-8
     username: ${GRIM_MYSQL_USER}
     password: ${GRIM_MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     show-sql: true
     properties:
       hibernate:
-      format_sql: true
-      dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
     defer-datasource-initialization: true
   hibernate:
     ddl-auto: update
+
   sql:
     init:
       mode: always
+
   data:
     redis:
-    host: localhost
-    port: 6380
+      host: redis
+      port: 6379
+
   servlet:
     encoding:
       charset: UTF-8
@@ -34,6 +39,7 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
   mail:
     host: smtp.gmail.com
     port: 587
@@ -58,7 +64,7 @@ cloud:
       auto: false
 
 server:
-  port: 8081
+  port: 8080
   servlet:
     context-path: /api
 
@@ -70,21 +76,20 @@ jwt:
   header: Authorization
 
 springdoc:
-    packages-to-scan: com.grimeet.grimeet
-    default-consumes-media-type: application/json;charset=UTF-8
-    default-produces-media-type: application/json;charset=UTF-8
-    swagger-ui:
-      path: /swagger
-      doc-expansion: list # 문서 확장 방식 설정 -> none, list(default), full
-      filter: true # 필터 기능 활성화
-      disable-swagger-default-url: true
-      display-request-duration: true
-      operations-sorter: method  # operation 정렬방식 설정 -> alpha, method, order
-      deep-linking: true
-      syntax-highlight:
-        activated: true
+  packages-to-scan: com.grimeet.grimeet
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger
+    doc-expansion: list
+    filter: true
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: method
+    deep-linking: true
+    syntax-highlight:
+      activated: true
 
 cookie:
   maxAge:
     access: ${GRIM_JWT_EXPIRATION_MS}
-
