@@ -1,5 +1,4 @@
-# Ignore Gradle build output
-build/
+# Ignore Gradle cache only (not build outputs)
 .gradle/
 
 # Ignore IntelliJ / VSCode / IDE metadata
