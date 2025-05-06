@@ -101,7 +101,7 @@ public class SocialAccountController {
     return Map.of("url", naverConnectUrl);
   }
 
-  @PostMapping("naver")
+  @PostMapping("/naver")
   public void linkNaverAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
           @RequestParam("code") String code

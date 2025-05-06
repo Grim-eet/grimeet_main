@@ -32,9 +32,13 @@ public class KakaoOAuthServiceImpl implements OAuthService {
 
     @Override
     public String generateAuthUrl() {
-        return AUTH_URI + "?client_id=" + clientId +
-                "&redirect_uri=" + redirectUri +
-                "&response_type=code";
+        String responseType = "code";
+        String scope = "account_email,profile_image";
+        return AUTH_URI + "?client_id=" + clientId
+                + "&redirect_uri=" + redirectUri
+                + "&response_type=" + responseType
+                + "&scope=" + scope
+                +  "access_type=offline";
     }
 
     @Override
