@@ -1,0 +1,11 @@
+cloud:
+  aws:
+    credentials:
+      accessKey: ${GRIM_AWS_ACCESS_KEY}
+      secretKey: ${GRIM_AWS_SECRET_KEY}
+    region:
+      static: ${GRIM_AWS_REGION}
+    s3:
+      bucketName: ${GRIM_AWS_BUCKET}
+    stack:
+      auto: false
