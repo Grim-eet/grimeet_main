@@ -2,6 +2,7 @@ package com.grimeet.grimeet.common.config.oauth.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
+import com.grimeet.grimeet.common.constant.AuthConstants;
 import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.util.jwt.JwtUtil;
 import com.grimeet.grimeet.domain.auth.entity.RefreshToken;
@@ -33,9 +34,6 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
   private final UserFacade userFacade;
   private final RefreshTokenRepository refreshTokenRepository;
   private final ObjectMapper objectMapper;
-
-  private final String AUTH_HEADER = "Authorization";
-  private final String TOKEN_PREFIX = "Bearer ";
 
   @Override
   public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -101,7 +99,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
     }
 
     // 5. Response Header에 AccessToken 추가
-    response.setHeader(AUTH_HEADER, TOKEN_PREFIX + accessToken);
+    response.setHeader(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_PREFIX + accessToken);
 
     // 6. ResponseBody에 RefreshToken 추가
     Map<String, String> tokenResponse = Map.of(
