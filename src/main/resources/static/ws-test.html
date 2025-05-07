@@ -22,7 +22,10 @@
 
         // JWT를 헤더에 담아서 보냄
         stompClient.connect(
-            { 'Authorization': 'Bearer ' + token },
+            {
+                'Authorization': 'Bearer ' + token,
+                'project-id': 'default'
+            },
             function (frame) {
                 console.log('Connected: ' + frame);
                 stompClient.subscribe('/topic/greetings', function (greeting) {
@@ -30,6 +33,14 @@
                 });
             }
         );
+
+        window.onbeforeunload = function () {
+            if (stompClient && stompClient.connected) {
+                stompClient.disconnect(() => {
+                    console.log('Disconnected before closing');
+                });
+            }
+        };
     }
 
 
