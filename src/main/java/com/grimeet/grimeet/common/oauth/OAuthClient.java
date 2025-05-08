@@ -38,6 +38,10 @@ public class OAuthClient {
             ResponseEntity<Map> response = restTemplate.postForEntity(config.getTokenUri(), request, Map.class);
             Map<String, Object> body = response.getBody();
             if (body == null || !body.containsKey("access_token")) {
+                log.info("tokenUri = {}", config.getTokenUri());
+                log.info("params = {}", params);
+                log.info("response = {}", response);
+                log.info("body = {}", body);
                 throw new GrimeetException(ExceptionStatus.OAUTH2_ACCESS_TOKEN_NOT_FOUND);
             }
             return (String) body.get("access_token");

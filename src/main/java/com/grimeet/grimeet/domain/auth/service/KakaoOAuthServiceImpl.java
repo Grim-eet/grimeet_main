@@ -5,9 +5,11 @@ import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.oauth.OAuthClient;
 import com.grimeet.grimeet.common.oauth.OAuthConfig;
 import com.grimeet.grimeet.common.oauth.OAuthService;
+import com.grimeet.grimeet.common.oauth.OAuthStateJwtProvider;
 import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
 import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountRequestDto;
 import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class KakaoOAuthServiceImpl implements OAuthService {
 
     private final OAuthClient oAuthClient;
     private final SocialAccountFacade socialAccountFacade;
+    private final OAuthStateJwtProvider stateJwtProvider;
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -34,16 +37,25 @@ public class KakaoOAuthServiceImpl implements OAuthService {
 
     @Override
     public String generateAuthUrl() {
-        String responseType = "code";
+        String state = stateJwtProvider.createStateToken(Provider.KAKAO.name());
+
         String scope = "profile_nickname,account_email";
         return AUTH_URI + "?client_id=" + clientId
                 + "&redirect_uri=" + redirectUri
-                + "&response_type=" + responseType
+                + "&response_type=code"
+                + "&state=" + state
                 + "&scope=" + scope;
     }
 
     @Override
-    public void linkAccount(String username, String code) {
+    public void linkAccount(String username, String code, String state) {
+        Claims claims = stateJwtProvider.validateStateToken(state);
+        String providerFromState = claims.get("provider", String.class);
+
+        if (!Provider.KAKAO.name().equals(providerFromState)) {
+            throw new GrimeetException(ExceptionStatus.OAUTH2_INVALID_STATE);
+        }
+
         OAuthConfig kakaoConfig = new OAuthConfig(
                 clientId,
                 clientSecret,
@@ -55,14 +67,13 @@ public class KakaoOAuthServiceImpl implements OAuthService {
         String accessToken = oAuthClient.getAccessToken(kakaoConfig, code, Provider.KAKAO);
         Map<String, Object> userInfo = oAuthClient.getUserInfo(USER_INFO_URI, accessToken);
 
-        if (userInfo == null || !userInfo.containsKey("id")) {
+        Object id = userInfo.get("id");
+        if (id == null) {
             throw new GrimeetException(ExceptionStatus.OAUTH2_USERINFO_NOT_FOUND);
         }
 
-        String kakaoId = String.valueOf(userInfo.get("id"));
-
         SocialAccountRequestDto dto = SocialAccountRequestDto.builder()
-                .socialId(kakaoId)
+                .socialId(String.valueOf(id))
                 .provider(Provider.KAKAO)
                 .build();
 

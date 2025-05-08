@@ -89,10 +89,11 @@ public class SocialAccountController {
   @PostMapping("/kakao")
   public void linkKakaoAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
-          @RequestParam("code") String code
+          @RequestParam("code") String code,
+          @RequestParam("state") String state
   ) {
     String username = principal.getUsername();
-    kakaoOAuthService.linkAccount(username, code);
+    kakaoOAuthService.linkAccount(username, code, state);
   }
 
   @GetMapping("/connect/naver")
@@ -104,10 +105,11 @@ public class SocialAccountController {
   @PostMapping("/naver")
   public void linkNaverAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
-          @RequestParam("code") String code
+          @RequestParam("code") String code,
+          @RequestParam("state") String state
   ) {
     String username = principal.getUsername();
-    naverOAuthService.linkAccount(username, code);
+    naverOAuthService.linkAccount(username, code, state);
   }
 
 }
