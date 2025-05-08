@@ -20,8 +20,11 @@ public class WebSocketEventListener {
   public void handleWebSocketConnectListener(SessionConnectEvent event) {
     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
     String sessionId = accessor.getSessionId();
-    String userName = accessor.getUser() != null ? accessor.getUser().getName() : "Unknown User";
+    String userName = accessor.getUser() != null
+            ? accessor.getUser().getName()
+            : redisTemplate.opsForValue().get("session:" + accessor.getSessionId());
     String projectId = accessor.getFirstNativeHeader("project-id");
+
 
     if (projectId == null || projectId.isBlank()) projectId = "default";
 

@@ -1,52 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>WebSocket Test</title>
+    <title>WebSocket Draw Data Test</title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
 <body>
-<h1>WebSocket Test</h1>
+<h1>🎨 WebSocket Draw Data 테스트</h1>
 <button onclick="connect()">Connect</button>
-<button onclick="sendMessage()">Send Hello</button>
+<button onclick="sendDrawData()">Send Draw Data</button>
 <div id="messages"></div>
 
 <script>
     let stompClient = null;
+    const projectId = "1";
 
     function connect() {
         const token = localStorage.getItem('access_token');
         const socket = new SockJS('http://localhost:8080/api/ws');
         stompClient = Stomp.over(socket);
 
-        // JWT를 헤더에 담아서 보냄
         stompClient.connect(
             {
                 'Authorization': 'Bearer ' + token,
-                'project-id': 'default'
+                'project-id': projectId
             },
             function (frame) {
-                console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/greetings', function (greeting) {
-                    document.getElementById('messages').innerHTML += '<div>' + greeting.body + '</div>';
+                console.log('Connected:', frame);
+
+                stompClient.subscribe('/topic/greetings', function (message) {
+                    document.getElementById('messages').innerHTML += `<div>${message.body}</div>`;
                 });
             }
         );
-
-        window.onbeforeunload = function () {
-            if (stompClient && stompClient.connected) {
-                stompClient.disconnect(() => {
-                    console.log('Disconnected before closing');
-                });
-            }
-        };
     }
 
+    function sendDrawData() {
+        const drawData = {
+            projectId: projectId,
+            coordinates: [
+                {
+                    x: 120,
+                    y: 250,
+                    color: "blue",
+                    stroke: 4,
+                    tool: "pen",
+                    timestamp: Date.now()
+                },
+                {
+                    x: 125,
+                    y: 255,
+                    color: "blue",
+                    stroke: 4,
+                    tool: "pen",
+                    timestamp: Date.now()
+                }
+            ],
+            action: "draw"
+        };
 
-
-    function sendMessage() {
-        stompClient.send("/app/hello", {}, "그리밋!");
+        stompClient.send("/app/draw", {}, JSON.stringify(drawData));
+        console.log("📤 Draw data sent:", drawData);
     }
 </script>
 </body>
