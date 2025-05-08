@@ -1,12 +1,12 @@
-package com.grimeet.grimeet.domain.socialAccount.service;
+package com.grimeet.grimeet.domain.social_account.service;
 
 import com.grimeet.grimeet.common.exception.ExceptionStatus;
 import com.grimeet.grimeet.common.exception.GrimeetException;
-import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
-import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountRequestDto;
-import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountResponseDto;
-import com.grimeet.grimeet.domain.socialAccount.entity.SocialAccount;
-import com.grimeet.grimeet.domain.socialAccount.repository.SocialAccountRepository;
+import com.grimeet.grimeet.domain.social_account.dto.Provider;
+import com.grimeet.grimeet.domain.social_account.dto.SocialAccountRequestDto;
+import com.grimeet.grimeet.domain.social_account.dto.SocialAccountResponseDto;
+import com.grimeet.grimeet.domain.social_account.entity.SocialAccount;
+import com.grimeet.grimeet.domain.social_account.repository.SocialAccountRepository;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.service.UserFacade;
 import io.swagger.v3.oas.annotations.tags.Tag;

@@ -1,10 +1,10 @@
-package com.grimeet.grimeet.domain.websocket.drawData.service;
+package com.grimeet.grimeet.domain.websocket.draw_data.service;
 
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.service.UserFacade;
-import com.grimeet.grimeet.domain.websocket.drawData.dto.DrawDataRequestDto;
-import com.grimeet.grimeet.domain.websocket.drawData.entity.DrawDataDocument;
-import com.grimeet.grimeet.domain.websocket.drawData.repository.DrawDataMongoRepository;
+import com.grimeet.grimeet.domain.websocket.draw_data.dto.DrawDataRequestDto;
+import com.grimeet.grimeet.domain.websocket.draw_data.entity.DrawDataDocument;
+import com.grimeet.grimeet.domain.websocket.draw_data.repository.DrawDataMongoRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

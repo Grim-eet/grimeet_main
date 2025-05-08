@@ -1,8 +1,8 @@
-package com.grimeet.grimeet.domain.userLog.service;
+package com.grimeet.grimeet.domain.user_log.service;
 
-import com.grimeet.grimeet.domain.userLog.dto.UserLogResponseDto;
-import com.grimeet.grimeet.domain.userLog.entity.UserLog;
-import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
+import com.grimeet.grimeet.domain.user_log.dto.UserLogResponseDto;
+import com.grimeet.grimeet.domain.user_log.entity.UserLog;
+import com.grimeet.grimeet.domain.user_log.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

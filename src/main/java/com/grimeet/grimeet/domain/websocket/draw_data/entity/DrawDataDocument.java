@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.websocket.drawData.entity;
+package com.grimeet.grimeet.domain.websocket.draw_data.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;

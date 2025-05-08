@@ -1,6 +1,6 @@
-package com.grimeet.grimeet.domain.userLog.service;
+package com.grimeet.grimeet.domain.user_log.service;
 
-import com.grimeet.grimeet.domain.userLog.dto.UserLogResponseDto;
+import com.grimeet.grimeet.domain.user_log.dto.UserLogResponseDto;
 
 import java.util.List;
 

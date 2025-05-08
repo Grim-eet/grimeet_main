@@ -1,6 +1,6 @@
-package com.grimeet.grimeet.domain.websocket.drawData.repository;
+package com.grimeet.grimeet.domain.websocket.draw_data.repository;
 
-import com.grimeet.grimeet.domain.websocket.drawData.entity.DrawDataDocument;
+import com.grimeet.grimeet.domain.websocket.draw_data.entity.DrawDataDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

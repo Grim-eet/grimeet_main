@@ -1,7 +1,7 @@
-package com.grimeet.grimeet.domain.websocket.drawData.controller;
+package com.grimeet.grimeet.domain.websocket.draw_data.controller;
 
-import com.grimeet.grimeet.domain.websocket.drawData.dto.DrawDataRequestDto;
-import com.grimeet.grimeet.domain.websocket.drawData.service.DrawDataService;
+import com.grimeet.grimeet.domain.websocket.draw_data.dto.DrawDataRequestDto;
+import com.grimeet.grimeet.domain.websocket.draw_data.service.DrawDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;

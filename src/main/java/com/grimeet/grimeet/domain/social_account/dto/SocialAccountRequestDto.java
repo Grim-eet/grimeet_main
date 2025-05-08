@@ -1,10 +1,9 @@
-package com.grimeet.grimeet.domain.socialAccount.dto;
+package com.grimeet.grimeet.domain.social_account.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Getter

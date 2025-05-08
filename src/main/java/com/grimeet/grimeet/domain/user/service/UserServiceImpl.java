@@ -10,7 +10,7 @@ import com.grimeet.grimeet.domain.upload.service.S3ImageService;
 import com.grimeet.grimeet.domain.user.dto.*;
 import com.grimeet.grimeet.domain.user.entity.User;
 import com.grimeet.grimeet.domain.user.repository.UserRepository;
-import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
+import com.grimeet.grimeet.domain.user_log.service.UserLogFacade;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

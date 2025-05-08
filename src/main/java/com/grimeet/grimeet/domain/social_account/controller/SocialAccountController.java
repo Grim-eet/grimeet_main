@@ -1,10 +1,10 @@
-package com.grimeet.grimeet.domain.socialAccount.controller;
+package com.grimeet.grimeet.domain.social_account.controller;
 
 import com.grimeet.grimeet.common.config.oauth.UserPrincipalDetails;
 import com.grimeet.grimeet.domain.auth.service.GoogleAuthServiceImpl;
-import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountRequestDto;
-import com.grimeet.grimeet.domain.socialAccount.dto.SocialAccountResponseDto;
-import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
+import com.grimeet.grimeet.domain.social_account.dto.SocialAccountRequestDto;
+import com.grimeet.grimeet.domain.social_account.dto.SocialAccountResponseDto;
+import com.grimeet.grimeet.domain.social_account.service.SocialAccountFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

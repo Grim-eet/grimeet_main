@@ -1,7 +1,7 @@
-package com.grimeet.grimeet.domain.userLog.repository;
+package com.grimeet.grimeet.domain.user_log.repository;
 
 import com.grimeet.grimeet.domain.user.dto.UserStatus;
-import com.grimeet.grimeet.domain.userLog.entity.UserLog;
+import com.grimeet.grimeet.domain.user_log.entity.UserLog;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

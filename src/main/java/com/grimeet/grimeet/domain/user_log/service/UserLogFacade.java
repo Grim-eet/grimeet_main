@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.userLog.service;
+package com.grimeet.grimeet.domain.user_log.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,7 @@
-package com.grimeet.grimeet.domain.socialAccount.entity;
+package com.grimeet.grimeet.domain.social_account.entity;
 
 import com.grimeet.grimeet.common.entity.BaseTime;
-import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
-import com.grimeet.grimeet.domain.user.entity.User;
+import com.grimeet.grimeet.domain.social_account.dto.Provider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.socialAccount.dto;
+package com.grimeet.grimeet.domain.social_account.dto;
 
 import lombok.AllArgsConstructor;
 

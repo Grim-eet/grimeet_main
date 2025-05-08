@@ -1,6 +1,6 @@
-package com.grimeet.grimeet.domain.userLog.dto;
+package com.grimeet.grimeet.domain.user_log.dto;
 
-import com.grimeet.grimeet.domain.userLog.entity.UserLog;
+import com.grimeet.grimeet.domain.user_log.entity.UserLog;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

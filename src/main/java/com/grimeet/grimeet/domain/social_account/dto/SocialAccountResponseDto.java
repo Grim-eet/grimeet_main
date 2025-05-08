@@ -1,9 +1,8 @@
-package com.grimeet.grimeet.domain.socialAccount.dto;
+package com.grimeet.grimeet.domain.social_account.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Schema(description = "소셜 계정 응답 DTO", title = "SocialAccountResponseDto")

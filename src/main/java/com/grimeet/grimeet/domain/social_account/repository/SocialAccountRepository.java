@@ -1,7 +1,7 @@
-package com.grimeet.grimeet.domain.socialAccount.repository;
+package com.grimeet.grimeet.domain.social_account.repository;
 
-import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
-import com.grimeet.grimeet.domain.socialAccount.entity.SocialAccount;
+import com.grimeet.grimeet.domain.social_account.dto.Provider;
+import com.grimeet.grimeet.domain.social_account.entity.SocialAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

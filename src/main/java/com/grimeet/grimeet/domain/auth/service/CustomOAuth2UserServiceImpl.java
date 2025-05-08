@@ -1,9 +1,8 @@
 package com.grimeet.grimeet.domain.auth.service;
 
 import com.grimeet.grimeet.common.config.oauth.info.OAuthAttributes;
-import com.grimeet.grimeet.domain.socialAccount.dto.Provider;
-import com.grimeet.grimeet.domain.socialAccount.entity.SocialAccount;
-import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
+import com.grimeet.grimeet.domain.social_account.dto.Provider;
+import com.grimeet.grimeet.domain.social_account.service.SocialAccountFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

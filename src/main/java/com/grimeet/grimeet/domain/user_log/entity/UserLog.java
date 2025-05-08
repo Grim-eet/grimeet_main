@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.userLog.entity;
+package com.grimeet.grimeet.domain.user_log.entity;
 
 import com.grimeet.grimeet.common.entity.BaseTime;
 import io.swagger.v3.oas.annotations.media.Schema;

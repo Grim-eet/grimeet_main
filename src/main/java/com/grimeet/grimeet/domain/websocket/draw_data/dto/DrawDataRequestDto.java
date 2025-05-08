@@ -1,4 +1,4 @@
-package com.grimeet.grimeet.domain.websocket.drawData.dto;
+package com.grimeet.grimeet.domain.websocket.draw_data.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
