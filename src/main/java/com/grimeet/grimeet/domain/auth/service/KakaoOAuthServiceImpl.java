@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.auth.service;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.common.oauth.OAuthClient;
 import com.grimeet.grimeet.common.oauth.OAuthConfig;
 import com.grimeet.grimeet.common.oauth.OAuthService;
@@ -33,12 +35,11 @@ public class KakaoOAuthServiceImpl implements OAuthService {
     @Override
     public String generateAuthUrl() {
         String responseType = "code";
-        String scope = "account_email,profile_image";
+        String scope = "profile_nickname,account_email";
         return AUTH_URI + "?client_id=" + clientId
                 + "&redirect_uri=" + redirectUri
                 + "&response_type=" + responseType
-                + "&scope=" + scope
-                +  "access_type=offline";
+                + "&scope=" + scope;
     }
 
     @Override
@@ -51,8 +52,12 @@ public class KakaoOAuthServiceImpl implements OAuthService {
                 USER_INFO_URI
         );
 
-        String accessToken = oAuthClient.getAccessToken(kakaoConfig, code);
+        String accessToken = oAuthClient.getAccessToken(kakaoConfig, code, Provider.KAKAO);
         Map<String, Object> userInfo = oAuthClient.getUserInfo(USER_INFO_URI, accessToken);
+
+        if (userInfo == null || !userInfo.containsKey("id")) {
+            throw new GrimeetException(ExceptionStatus.OAUTH2_USERINFO_NOT_FOUND);
+        }
 
         String kakaoId = String.valueOf(userInfo.get("id"));
 

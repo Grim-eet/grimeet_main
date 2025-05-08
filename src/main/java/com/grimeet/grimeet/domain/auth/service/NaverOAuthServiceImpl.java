@@ -46,7 +46,7 @@ public class NaverOAuthServiceImpl implements OAuthService {
                 USER_INFO_URI
         );
 
-        String accessToken = oAuthClient.getAccessToken(naverConfig, code);
+        String accessToken = oAuthClient.getAccessToken(naverConfig, code, Provider.NAVER);
         Map<String, Object> userInfo = oAuthClient.getUserInfo(USER_INFO_URI, accessToken);
 
         Map<String, Object> response = (Map<String, Object>) userInfo.get("response");
