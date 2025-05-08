@@ -30,6 +30,9 @@ spring:
     redis:
       host: host.docker.internal
       port: 6379
+    mongodb:
+      uri: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@host.docker.internal:27017/${MONGO_DB_DATABASE}?authSource=admin
+
 
   servlet:
     encoding:

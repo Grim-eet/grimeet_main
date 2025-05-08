@@ -15,6 +15,20 @@ services:
       DEFAULT_AUTHENTICATION_PLUGIN: caching_sha2_password
     networks:
       - app-network
+  mongodb:
+    image: mongo:6.0
+    restart: always
+    container_name: grimeet-mongo
+    volumes:
+      - ./mongo-data:/data/db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_DATABASE}
+    networks:
+      - app-network
 
 volumes:
   mysql-data:
