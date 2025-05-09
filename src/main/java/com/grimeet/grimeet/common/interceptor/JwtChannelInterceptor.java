@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtCannelInterceptor implements ChannelInterceptor {
+public class JwtChannelInterceptor implements ChannelInterceptor {
 
   private final JwtUtil jwtUtil;
   private final RedisTemplate<String, String> redisTemplate;

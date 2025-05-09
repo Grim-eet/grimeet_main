@@ -1,6 +1,6 @@
 package com.grimeet.grimeet.common.config.websocket;
 
-import com.grimeet.grimeet.common.interceptor.JwtCannelInterceptor;
+import com.grimeet.grimeet.common.interceptor.JwtChannelInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -14,7 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-  private final JwtCannelInterceptor jwtCannelInterceptor;
+  private final JwtChannelInterceptor jwtCannelInterceptor;
 
   /**
    * WebSocket 연결을 위한 엔드포인트를 등록합니다.
