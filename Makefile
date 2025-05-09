@@ -35,7 +35,7 @@ docker-down:
 	docker-compose -f docker-compose-db.yml -f docker-compose-redis.yml -f docker-compose-app.yml down -v
 
 # Redeploy: down, build image, up
-re: docker-down docker-build docker-up
+re: docker-down fclean docker-build docker-up
 
 # Run the application using Gradle BootRun
 run:

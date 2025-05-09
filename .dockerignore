@@ -13,6 +13,10 @@
 .git
 .gitignore
 
+# Ignore DB files
+mysql-data/
+mongo-data/
+
 # Ignore local env files
 .env
 *.log

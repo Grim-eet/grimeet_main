@@ -1,10 +1,9 @@
 package com.grimeet.grimeet.common.batch.user;
 
 import com.grimeet.grimeet.domain.user.dto.UserStatus;
-import com.grimeet.grimeet.domain.user.service.UserService;
-import com.grimeet.grimeet.domain.userLog.entity.UserLog;
-import com.grimeet.grimeet.domain.userLog.repository.UserLogRepository;
-import com.grimeet.grimeet.domain.userLog.service.UserLogFacade;
+import com.grimeet.grimeet.domain.user_log.entity.UserLog;
+import com.grimeet.grimeet.domain.user_log.repository.UserLogRepository;
+import com.grimeet.grimeet.domain.user_log.service.UserLogFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

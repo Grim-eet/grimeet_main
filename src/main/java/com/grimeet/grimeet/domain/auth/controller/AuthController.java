@@ -1,5 +1,6 @@
 package com.grimeet.grimeet.domain.auth.controller;
 
+import com.grimeet.grimeet.common.constant.AuthConstants;
 import com.grimeet.grimeet.domain.auth.dto.AuthLoginResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.AuthResponseDto;
 import com.grimeet.grimeet.domain.auth.dto.TokenRefreshResponseDto;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
   private final AuthService authService;
-  private static final String HEADER_AUTH = "Authorization";
-  private static final String TOKEN_TYPE = "Bearer ";
 
 
   @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
@@ -49,7 +48,7 @@ public class AuthController {
     AuthResponseDto tokenDto = authService.login(userLoginRequestDto);
 
     return ResponseEntity.ok()
-            .header(HEADER_AUTH, TOKEN_TYPE + tokenDto.getAccessToken())
+            .header(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.BEARER_PREFIX + tokenDto.getAccessToken())
             .body(AuthLoginResponseDto.builder()
                     .refreshToken(tokenDto.getRefreshToken())
                     .isPasswordChangeRequired(tokenDto.getIsPasswordChangeRequired())

@@ -7,7 +7,7 @@ spring:
     time-zone: Asia/Seoul
 
   datasource:
-    url: jdbc:mysql://mysql:3306/grim?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:${GRIM_DB_HOST}://${GRIM_DB_HOST}:${GRIM_DB_PORT}/${GRIM_MYSQL_DATABASE}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ${GRIM_MYSQL_USER}
     password: ${GRIM_MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,8 +28,16 @@ spring:
 
   data:
     redis:
-      host: redis
+      host: host.docker.internal
       port: 6379
+    mongodb:
+      host: ${MONGO_DB_HOST}
+      port: ${MONGO_DB_PORT}
+      username: ${MONGO_INITDB_ROOT_USERNAME}
+      password: ${MONGO_INITDB_ROOT_PASSWORD}
+      authentication-database: admin
+      database: ${MONGO_INITDB_DATABASE}
+
 
   servlet:
     encoding:
