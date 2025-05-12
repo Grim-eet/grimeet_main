@@ -31,11 +31,13 @@ public class WebSocketEventListener {
     log.info("🟢 [WebSocketEventListener] WebSocket 연결됨: sessionId={}, userName={}, projectId={}", sessionId, userName, projectId);
 
     String redisKey = "project:" + projectId + ":users";
-    if (!"Unknown User".equals(userName)) {
+    if (userName != null && !userName.isBlank()) {
       redisTemplate.opsForSet().add(redisKey, userName);
       redisTemplate.opsForValue().set("session:" + sessionId, userName);
       redisTemplate.opsForValue().set("session:" + sessionId + ":projectId", projectId);
       log.info("🟢 Redis에 사용자 추가 및 매핑 완료: {} → {}, projectId={}", sessionId, userName, projectId);
+    } else {
+      log.warn("❌ WebSocket 연결 - 사용자 정보가 없어 Redis에 등록하지 못함: sessionId={}", sessionId);
     }
   }
 
