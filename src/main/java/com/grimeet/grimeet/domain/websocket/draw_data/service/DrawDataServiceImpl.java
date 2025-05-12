@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
+import java.util.List;
 
 @Slf4j
 @Transactional
@@ -30,20 +31,24 @@ public class DrawDataServiceImpl implements DrawDataService {
               .projectId(dto.getProjectId())
               .userId(String.valueOf(findUser.getId()))
               .timestamp(LocalDateTime.now())
-              .coordinates(dto.getCoordinates().stream().map(c ->
-                      DrawDataDocument.Coordinate.builder()
-                              .x(c.getX())
-                              .y(c.getY())
-                              .color(c.getColor())
-                              .stroke(c.getStroke())
-                              .tool(c.getTool())
-                              .timestamp(c.getTimestamp())
-                              .build()
-              ).collect(Collectors.toList()))
+              .coordinates(toCoordinates(dto))
               .build();
 
       drawDataMongoRepository.save(document);
       log.info("✅ [DrawData Service] Draw data 저장 완료: projectId={}, userId={}", dto.getProjectId(), userEmail);
     }
+
+  private List<DrawDataDocument.Coordinate> toCoordinates(DrawDataRequestDto dto) {
+    return dto.getCoordinates().stream()
+            .map(c -> DrawDataDocument.Coordinate.builder()
+                    .x(c.getX())
+                    .y(c.getY())
+                    .color(c.getColor())
+                    .stroke(c.getStroke())
+                    .tool(c.getTool())
+                    .timestamp(c.getTimestamp())
+                    .build())
+            .toList();
+  }
 
 }
