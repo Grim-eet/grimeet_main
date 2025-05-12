@@ -26,7 +26,9 @@ public class WebSocketUserResolver {
       if (userEmail != null) {
         return userEmail;
       }
-      log.warn("🟥 Unknown session ID in Redis lookup: {}", sessionId);
+      log.warn("🟧 sessionId: {}", sessionId);
+    } else {
+      log.warn("🟥 WebSocket 인증 실패: 세션 ID 없음");
     }
 
     throw new GrimeetException(ExceptionStatus.UNAUTHORIZED_USER);
