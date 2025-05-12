@@ -1,10 +1,14 @@
 package com.grimeet.grimeet.domain.websocket.service;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebSocketUserResolver {
@@ -22,9 +26,10 @@ public class WebSocketUserResolver {
       if (userEmail != null) {
         return userEmail;
       }
+      log.warn("🟥 Unknown session ID in Redis lookup: {}", sessionId);
     }
 
-    throw new IllegalStateException("User is not authenticated.");
+    throw new GrimeetException(ExceptionStatus.UNAUTHORIZED_USER);
   }
 }
 
