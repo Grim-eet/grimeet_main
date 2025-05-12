@@ -1,13 +1,8 @@
 package com.grimeet.grimeet.common.batch.user;
 
-import com.grimeet.grimeet.domain.userLog.dto.UserLogResponseDto;
-import com.grimeet.grimeet.domain.userLog.service.UserLogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor

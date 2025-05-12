@@ -9,14 +9,21 @@ services:
       - host.docker.internal:host-gateway
     environment:
       # Database
-      DB_HOST: mysql
-      DB_PORT: 3306
+      GRIM_DB_HOST: ${GRIM_MYSQL_HOST}
+      GRIM_DB_PORT: ${GRIM_MYSQL_PORT}
       GRIM_MYSQL_USER: ${GRIM_MYSQL_USER}
       GRIM_MYSQL_PASSWORD: ${GRIM_MYSQL_PASSWORD}
       GRIM_MYSQL_DATABASE: ${GRIM_MYSQL_DATABASE}
 
+      # MongoDB
+      MONGO_DB_HOST: ${MONGO_DB_HOST}
+      MONGO_DB_PORT: ${MONGO_DB_PORT}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+
       # Redis
-      REDIS_HOST: redis
+      REDIS_HOST: localhost
       REDIS_PORT: 6379
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       REDIS_DB: ${REDIS_DB}
@@ -56,7 +63,7 @@ services:
 
     depends_on:
       - mysql
-      - redis
+      - mongodb
     networks:
       - app-network
 
