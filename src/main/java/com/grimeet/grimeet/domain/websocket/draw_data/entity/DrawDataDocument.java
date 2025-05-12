@@ -30,8 +30,8 @@ public class DrawDataDocument {
   private String projectId;
 
   @Field(name = "user_id")
-  @Schema(description = "유저 ID", example = "jgoneit@gmail.com")
-  private String userId;
+  @Schema(description = "유저 ID", example = "1")
+  private long userId;
 
   @Field(name = "timestamp")
   @Schema(description = "좌표 저장 시간", example = "2025-05-02T13:30:00")

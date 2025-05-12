@@ -34,7 +34,10 @@ public enum ExceptionStatus {
   S3_DELETE_FAIL(HttpStatus.BAD_REQUEST, 400, "S3 이미지 삭제에 실패했습니다."),
 
   // FOLLOW
-  INVALID_FOLLOW(HttpStatus.BAD_REQUEST, 400, "잘못된 팔로우 요청입니다.");
+  INVALID_FOLLOW(HttpStatus.BAD_REQUEST, 400, "잘못된 팔로우 요청입니다."),
+
+  // PROJECT
+  INVALID_TIMESTAMP_FORMAT(HttpStatus.BAD_REQUEST, 400, "타임스탬프의 형식이 잘못되었습니다.");
 
   private final int status;
   private final int customCode;

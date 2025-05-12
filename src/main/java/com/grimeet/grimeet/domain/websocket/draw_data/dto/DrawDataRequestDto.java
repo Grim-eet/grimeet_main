@@ -18,7 +18,7 @@ public class DrawDataRequestDto {
     private String projectId;
 
     @Schema(description = "사용자 ID (서버에서 설정됨)", example = "1234")
-    private String userId;
+    private long userId;
 
     @NotEmpty(message = "coordinates must not be empty")
     @Valid
@@ -52,6 +52,6 @@ public class DrawDataRequestDto {
 
         @Schema(description = "이 좌표의 시간(ms)", example = "1682847300000")
         @Positive(message = "timestamp must be positive")
-        private long timestamp;
+        private String timestamp;
     }
 }

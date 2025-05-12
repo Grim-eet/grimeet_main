@@ -1,5 +1,7 @@
 package com.grimeet.grimeet.domain.websocket.draw_data.service;
 
+import com.grimeet.grimeet.common.exception.ExceptionStatus;
+import com.grimeet.grimeet.common.exception.GrimeetException;
 import com.grimeet.grimeet.domain.user.dto.UserResponseDto;
 import com.grimeet.grimeet.domain.user.service.UserFacade;
 import com.grimeet.grimeet.domain.websocket.draw_data.dto.DrawDataRequestDto;
@@ -29,7 +31,7 @@ public class DrawDataServiceImpl implements DrawDataService {
 
       DrawDataDocument document = DrawDataDocument.builder()
               .projectId(dto.getProjectId())
-              .userId(String.valueOf(findUser.getId()))
+              .userId(findUser.getId())
               .timestamp(LocalDateTime.now())
               .coordinates(toCoordinates(dto))
               .build();
@@ -40,15 +42,25 @@ public class DrawDataServiceImpl implements DrawDataService {
 
   private List<DrawDataDocument.Coordinate> toCoordinates(DrawDataRequestDto dto) {
     return dto.getCoordinates().stream()
-            .map(c -> DrawDataDocument.Coordinate.builder()
-                    .x(c.getX())
-                    .y(c.getY())
-                    .color(c.getColor())
-                    .stroke(c.getStroke())
-                    .tool(c.getTool())
-                    .timestamp(c.getTimestamp())
-                    .build())
+            .map(c -> {
+              long timestamp;
+              try {
+                timestamp = Long.parseLong(c.getTimestamp());
+              } catch (NumberFormatException e) {
+                log.warn("❌ timestamp 파싱 실패: {}", c.getTimestamp(), e);
+                throw new GrimeetException(ExceptionStatus.INVALID_TIMESTAMP_FORMAT);
+              }
+              return DrawDataDocument.Coordinate.builder()
+                      .x(c.getX())
+                      .y(c.getY())
+                      .color(c.getColor())
+                      .stroke(c.getStroke())
+                      .tool(c.getTool())
+                      .timestamp(timestamp)
+                      .build();
+            })
             .toList();
   }
+
 
 }
