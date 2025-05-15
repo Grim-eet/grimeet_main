@@ -36,8 +36,8 @@ public class KakaoOAuthServiceImpl implements OAuthService {
     private static final String AUTH_URI = "https://kauth.kakao.com/oauth/authorize";
 
     @Override
-    public String generateAuthUrl() {
-        String state = stateJwtProvider.createStateToken(Provider.KAKAO.name());
+    public String generateAuthUrl(String username) {
+        String state = stateJwtProvider.createStateToken(username, Provider.KAKAO.name());
 
         String scope = "profile_nickname,account_email";
         return AUTH_URI + "?client_id=" + clientId

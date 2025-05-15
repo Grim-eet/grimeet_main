@@ -38,8 +38,8 @@ public class GoogleOAuthServiceImpl implements OAuthService {
   private static final String AUTH_URI = "https://accounts.google.com/o/oauth2/v2/auth";
 
   @Override
-  public String generateAuthUrl() {
-    String state = stateJwtProvider.createStateToken(Provider.GOOGLE.name());
+  public String generateAuthUrl(String username) {
+    String state = stateJwtProvider.createStateToken(username, Provider.GOOGLE.name());
     return AUTH_URI + "?client_id=" + clientId
             + "&redirect_uri=" + redirectUri
             + "&response_type=code"

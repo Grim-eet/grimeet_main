@@ -54,6 +54,10 @@ jwt:
   token-prefix: Bearer
   header: Authorization
 
+crypto:
+  aes:
+    secret: ${GRIM_JWT_CRYPTO_AES_SECRET}
+
 cookie:
   maxAge:
     access: ${GRIM_JWT_EXPIRATION_MS}

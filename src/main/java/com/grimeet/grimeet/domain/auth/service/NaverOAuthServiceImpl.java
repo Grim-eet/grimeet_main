@@ -37,8 +37,8 @@ public class NaverOAuthServiceImpl implements OAuthService {
     private static final String AUTH_URI = "https://nid.naver.com/oauth2.0/authorize";
 
     @Override
-    public String generateAuthUrl() {
-        String state = stateJwtProvider.createStateToken(Provider.NAVER.name());
+    public String generateAuthUrl(String username) {
+        String state = stateJwtProvider.createStateToken(username, Provider.NAVER.name());
 
 
         return AUTH_URI + "?client_id=" + clientId +

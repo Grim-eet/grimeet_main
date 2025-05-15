@@ -73,50 +73,56 @@ public class SocialAccountController {
 //  }
 
   @GetMapping("/connect/google")
-  public Map<String, String> getGoogleConnectUrl() {
-    String googleConnectUrl = googleOAuthService.generateAuthUrl();
+  public Map<String, String> getGoogleConnectUrl(
+          @AuthenticationPrincipal UserPrincipalDetails userPrincipal
+  ) {
+    String googleConnectUrl = googleOAuthService.generateAuthUrl(userPrincipal.getUsername());
     return Map.of("url", googleConnectUrl);
   }
 
   @PostMapping("/google")
   public void linkGoogleAccount(
-          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
+          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
   ) {
-    String username = principal.getUsername();
+    String username = userPrincipal.getUsername();
     googleOAuthService.linkAccount(username, code, state);
   }
 
   @GetMapping("/connect/kakao")
-  public Map<String, String> getKakaoConnectUrl() {
-    String kakaoConnectUrl = kakaoOAuthService.generateAuthUrl();
+  public Map<String, String> getKakaoConnectUrl(
+          @AuthenticationPrincipal UserPrincipalDetails userPrincipal
+  ) {
+    String kakaoConnectUrl = kakaoOAuthService.generateAuthUrl(userPrincipal.getUsername());
     return Map.of("url", kakaoConnectUrl);
   }
 
   @PostMapping("/kakao")
   public void linkKakaoAccount(
-          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
+          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
   ) {
-    String username = principal.getUsername();
+    String username = userPrincipal.getUsername();
     kakaoOAuthService.linkAccount(username, code, state);
   }
 
   @GetMapping("/connect/naver")
-  public Map<String, String> getNaverConnectUrl() {
-    String naverConnectUrl = naverOAuthService.generateAuthUrl();
+  public Map<String, String> getNaverConnectUrl(
+          @AuthenticationPrincipal UserPrincipalDetails userPrincipal
+  ) {
+    String naverConnectUrl = naverOAuthService.generateAuthUrl(userPrincipal.getUsername());
     return Map.of("url", naverConnectUrl);
   }
 
   @PostMapping("/naver")
   public void linkNaverAccount(
-          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails principal,
+          @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
   ) {
-    String username = principal.getUsername();
+    String username = userPrincipal.getUsername();
     naverOAuthService.linkAccount(username, code, state);
   }
 

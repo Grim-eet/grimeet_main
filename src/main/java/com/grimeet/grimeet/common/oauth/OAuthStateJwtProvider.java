@@ -20,6 +20,9 @@ public class OAuthStateJwtProvider {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Value("${crypto.aes.secret}")
+    private String aesSecret;
+
     private static final long EXPIRATION_MS = 5 * 60 * 1000;
 
     private Key key;
@@ -29,10 +32,11 @@ public class OAuthStateJwtProvider {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createStateToken(String provider) {
+    public String createStateToken(String username, String provider) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
                 .setSubject("oauth_state")
+                .claim("username", username)
                 .claim("provider", provider)
                 .setIssuedAt(new Date(now))
                 .setExpiration(new Date(now + EXPIRATION_MS))
