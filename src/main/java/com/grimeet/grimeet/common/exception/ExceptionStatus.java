@@ -13,12 +13,14 @@ public enum ExceptionStatus {
   OAUTH2_USERINFO_NOT_FOUND(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 정보가 없습니다."),
   OAUTH2_ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 Access Token이 없습니다."),
   OAUTH2_ACCESS_TOKEN_FAILED(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 Access Token 발급에 실패했습니다."),
+  OAUTH2_INVALID_STATE(HttpStatus.BAD_REQUEST, 400, "소셜 로그인 Jwt 인증에 실패했습니다."),
   INVALID_USER_EMAIL_AUTH(HttpStatus.BAD_REQUEST, 400, "인증되지 않은 이메일입니다."),
 
   // JWT
   UN_AUTHENTICATION_TOKEN(HttpStatus.UNAUTHORIZED, 401, "토큰 정보가 없습니다."),
   INVALID_TOKEN(HttpStatus.FORBIDDEN, 403, "유효하지 않은 토큰입니다."),
-
+  INVALID_AES_KEY_LENGTH(HttpStatus.UNPROCESSABLE_ENTITY, 422,"암호화 키는 16, 24, 32 바이트 중 하나여야 합니다."),
+  
   // USER
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, 404, "일치하는 유저정보를 찾을 수 없습니다."),
   EMAIL_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 400, "이미 존재하는 이메일입니다."),

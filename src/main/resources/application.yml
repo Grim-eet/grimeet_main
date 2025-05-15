@@ -2,7 +2,7 @@ spring:
   application:
     name: grimeet
   profiles:
-    include: oauth, mail, swagger, s3
+    active: oauth, mail, swagger, s3
   jackson:
     time-zone: Asia/Seoul
 
@@ -30,6 +30,8 @@ spring:
     redis:
       host: redis
       port: 6379
+      password: ${REDIS_PASSWORD}
+      database: 0
 
   servlet:
     encoding:
@@ -51,6 +53,10 @@ jwt:
   refreshExpirationMs: ${GRIM_JWT_REFRESH_EXPIRATION_MS}
   token-prefix: Bearer
   header: Authorization
+
+crypto:
+  aes:
+    secret: ${GRIM_CRYPTO_AES_SECRET}
 
 cookie:
   maxAge:

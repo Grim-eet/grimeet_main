@@ -11,17 +11,17 @@ spring:
           naver:
             client-id: ${GRIM_NAVER_CLIENT_KEY}
             client-secret: ${GRIM_NAVER_CLIENT_SECRET_KEY}
-            scope: profile,email,name
+            scope: email,nickname
             client-name: Naver
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/naver
+            redirect-uri: ${GRIM_NAVER_CALLBACK_URI_LOCAL}
           kakao:
             client-id: ${GRIM_KAKAO_REST_API_KEY}
-            client-secret: ${GRIM_KAKAO_SECRET_KEY}
+            client-secret: ${GRIM_KAKAO_CLIENT_SECRET_KEY}
             scope: profile_nickname,account_email
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8081/login/oauth2/code/kakao
+            redirect-uri: ${GRIM_KAKAO_CALLBACK_URI_LOCAL}
             client-authentication-method: POST
         provider:
           google:
