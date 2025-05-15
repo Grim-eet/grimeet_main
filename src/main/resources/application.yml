@@ -56,7 +56,7 @@ jwt:
 
 crypto:
   aes:
-    secret: ${GRIM_JWT_CRYPTO_AES_SECRET}
+    secret: ${GRIM_CRYPTO_AES_SECRET}
 
 cookie:
   maxAge:

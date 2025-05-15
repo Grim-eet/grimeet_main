@@ -48,10 +48,12 @@ public class GoogleOAuthServiceImpl implements OAuthService {
   }
 
   @Override
-  public void linkAccount(String username, String code, String state) {
+  public void linkAccount(String usernameFromLogin, String code, String state) {
     Claims claims = stateJwtProvider.validateStateToken(state);
     Provider providerFromState = Provider.valueOf(claims.get("provider", String.class));
-    if (providerFromState != Provider.GOOGLE) {
+    String usernameFromState = stateJwtProvider.extractDecryptedUsername(claims);
+
+    if (providerFromState != Provider.GOOGLE || !usernameFromLogin.equals(usernameFromState)) {
       throw new GrimeetException(ExceptionStatus.OAUTH2_INVALID_STATE);
     }
 
@@ -75,7 +77,7 @@ public class GoogleOAuthServiceImpl implements OAuthService {
             .provider(Provider.GOOGLE)
             .build();
 
-    socialAccountFacade.linkSocialAccount(username, socialAccountRequestDto);
+    socialAccountFacade.linkSocialAccount(usernameFromLogin, socialAccountRequestDto);
   }
 
 //  public void linkGoogleAccount(String username, String code) {

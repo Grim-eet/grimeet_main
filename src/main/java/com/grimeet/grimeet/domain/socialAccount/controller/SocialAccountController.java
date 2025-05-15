@@ -7,11 +7,13 @@ import com.grimeet.grimeet.domain.auth.service.NaverOAuthServiceImpl;
 import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/social-account")
@@ -88,6 +90,7 @@ public class SocialAccountController {
   ) {
     String username = userPrincipal.getUsername();
     googleOAuthService.linkAccount(username, code, state);
+    log.info("[SocialAccountController] 기존 회원 - 소셜 계정 연결 성공: username: {}", username);
   }
 
   @GetMapping("/connect/kakao")
