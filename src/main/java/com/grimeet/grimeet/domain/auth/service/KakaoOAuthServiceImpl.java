@@ -48,11 +48,12 @@ public class KakaoOAuthServiceImpl implements OAuthService {
     }
 
     @Override
-    public void linkAccount(String username, String code, String state) {
+    public void linkAccount(String usernameFromLogin, String code, String state) {
         Claims claims = stateJwtProvider.validateStateToken(state);
         String providerFromState = claims.get("provider", String.class);
+        String usernameFromState = stateJwtProvider.extractDecryptedUsername(claims);
 
-        if (!Provider.KAKAO.name().equals(providerFromState)) {
+        if (!Provider.KAKAO.name().equals(providerFromState) || !usernameFromLogin.equals(usernameFromState)) {
             throw new GrimeetException(ExceptionStatus.OAUTH2_INVALID_STATE);
         }
 
@@ -77,6 +78,6 @@ public class KakaoOAuthServiceImpl implements OAuthService {
                 .provider(Provider.KAKAO)
                 .build();
 
-        socialAccountFacade.linkSocialAccount(username, dto);
+        socialAccountFacade.linkSocialAccount(usernameFromLogin, dto);
     }
 }

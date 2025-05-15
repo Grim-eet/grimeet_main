@@ -8,6 +8,7 @@ import com.grimeet.grimeet.domain.socialAccount.service.SocialAccountFacade;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -83,7 +84,7 @@ public class SocialAccountController {
   }
 
   @PostMapping("/google")
-  public void linkGoogleAccount(
+  public ResponseEntity<String> linkGoogleAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
@@ -91,6 +92,7 @@ public class SocialAccountController {
     String username = userPrincipal.getUsername();
     googleOAuthService.linkAccount(username, code, state);
     log.info("[SocialAccountController] 기존 회원 - 소셜 계정 연결 성공: username: {}", username);
+    return ResponseEntity.ok("[SocialAccountController] 기존 회원 - 소셜 계정 연결 성공: 구글");
   }
 
   @GetMapping("/connect/kakao")
@@ -102,13 +104,14 @@ public class SocialAccountController {
   }
 
   @PostMapping("/kakao")
-  public void linkKakaoAccount(
+  public ResponseEntity<String> linkKakaoAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
   ) {
     String username = userPrincipal.getUsername();
     kakaoOAuthService.linkAccount(username, code, state);
+    return ResponseEntity.ok("[SocialAccountController] 기존 회원 - 소셜 계정 연결 성공: 카카오");
   }
 
   @GetMapping("/connect/naver")
@@ -120,13 +123,14 @@ public class SocialAccountController {
   }
 
   @PostMapping("/naver")
-  public void linkNaverAccount(
+  public ResponseEntity<String> linkNaverAccount(
           @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipalDetails userPrincipal,
           @RequestParam("code") String code,
           @RequestParam("state") String state
   ) {
     String username = userPrincipal.getUsername();
     naverOAuthService.linkAccount(username, code, state);
+    return ResponseEntity.ok("[SocialAccountController] 기존 회원 - 소셜 계정 연결 성공: 네이버");
   }
 
 }

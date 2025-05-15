@@ -40,7 +40,6 @@ public class NaverOAuthServiceImpl implements OAuthService {
     public String generateAuthUrl(String username) {
         String state = stateJwtProvider.createStateToken(username, Provider.NAVER.name());
 
-
         return AUTH_URI + "?client_id=" + clientId +
                 "&redirect_uri=" + redirectUri +
                 "&response_type=code"+
@@ -49,11 +48,13 @@ public class NaverOAuthServiceImpl implements OAuthService {
     }
 
     @Override
-    public void linkAccount(String username, String code, String state) {
+    public void linkAccount(String usernameFromLogin, String code, String state) {
         // 1. state 검증
         Claims claims = stateJwtProvider.validateStateToken(state);
         Provider providerFromState = Provider.valueOf(claims.get("provider", String.class));
-        if (providerFromState != Provider.NAVER) {
+        String usernameFromState = stateJwtProvider.extractDecryptedUsername(claims);
+
+        if (providerFromState != Provider.NAVER || !usernameFromLogin.equals(usernameFromState)) {
             throw new GrimeetException(ExceptionStatus.OAUTH2_INVALID_STATE);
         }
 
@@ -86,6 +87,6 @@ public class NaverOAuthServiceImpl implements OAuthService {
                 .provider(Provider.NAVER)
                 .build();
 
-        socialAccountFacade.linkSocialAccount(username, dto);
+        socialAccountFacade.linkSocialAccount(usernameFromLogin, dto);
     }
 }
