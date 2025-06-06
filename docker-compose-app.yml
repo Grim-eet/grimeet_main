@@ -9,8 +9,8 @@ services:
       - host.docker.internal:host-gateway
     environment:
       # Database
-      DB_HOST: mysql
-      DB_PORT: 3306
+      GRIM_DB_HOST: ${GRIM_DB_HOST}
+      GRIM_DB_PORT: ${GRIM_DB_PORT}
       GRIM_MYSQL_USER: ${GRIM_MYSQL_USER}
       GRIM_MYSQL_PASSWORD: ${GRIM_MYSQL_PASSWORD}
       GRIM_MYSQL_DATABASE: ${GRIM_MYSQL_DATABASE}

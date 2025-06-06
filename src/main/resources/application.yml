@@ -7,7 +7,7 @@ spring:
     time-zone: Asia/Seoul
 
   datasource:
-    url: jdbc:mysql://mysql:3306/grim?serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:${GRIM_DB_HOST}://${GRIM_DB_HOST}:${GRIM_DB_PORT}/grim
     username: ${GRIM_MYSQL_USER}
     password: ${GRIM_MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
